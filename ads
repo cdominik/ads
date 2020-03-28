@@ -4,6 +4,9 @@
 # Usage information with:   perldoc ads
 
 # Defaults for stuff that can be set with options
+
+use List::Util qw[min max];
+
 $sort       = "date";
 $sort_dir   = "desc";
 
@@ -26,7 +29,6 @@ getopts('rds:t:a:f:');
 if ($opt_r) { $refereed = 1 }
 
 # Process the arguments 
-$yearre = "^[12][0-9][0-9][0-9](-[12][0-9][0-9][0-9])?\$";
 while ($arg = shift @ARGV) {
   print "Processing argment $arg\n" if $opt_d;
   if ($arg =~ /^-([tafs])(.*)/) {
@@ -42,30 +44,28 @@ while ($arg = shift @ARGV) {
     print "delayed arg: $cmd\n" if $opt_d;
     eval $cmd;
 
-  } elsif ($arg =~ $yearre) {
+  } elsif ($arg =~ /^[0-9][-0-9]*$/) {
     # This is a year specification
-    if ($year_start) {
-      $year_end = $arg;
-    } else {
-      $year_start = $arg;
-    }
+    &handle_year($arg);
   } else {
+    # Everything else is an author name
     $arg=~s/_/ /g;
     push @authors,$arg;
   }
 }
-if ($year_start) {
-  if ($year_end) {
-    $years = " year:$year_start-$year_end";
-  } else {
-    $years = " year:$year_start";
-  }
+
+if (@years) {
+  $y1 = min @years;
+  $y2 = max @years;
+  $years = " year:";
+  if ($force_yr_range) {$years .= "$y1-"}
+  elsif ($y2 > $y1) {$years .= "$y1-$y2"}
+  else {$years .= $y1}
 }
-die "No authors specified\n" unless (@authors);
-while ($a=shift(@authors)) {
-  $authors .= " author:\"$a\"";
-}
+
+while ($a=shift(@authors)) { $authors .= " author:\"$a\""; }
 $authors =~ s/ //;
+
 if ($opt_t) { $title = ' title:"' . $opt_t . '"'; }
 if ($opt_a) { $abstract = ' abs:"' . $opt_a . '"'; }
 if ($opt_f) { $fulltext = ' full:"' . $opt_f . '"'; }
@@ -77,12 +77,14 @@ if ($opt_s) {
     $sort = $opt_s;
   }
 }
+
 if ($sort eq "first_author") {$sort_dir = "asc";} # change sort direction
 $sorting  = "&sort=$sort $sort_dir, bibcode desc";
 
 $refstring =  "filter_property_fq_property=AND&filter_property_fq_property=property%3A%22refereed%22&fq=%7B!type=aqp%20v%3D%24fq_property%7D&fq_property=(property%3A%22refereed%22)&";
 
 $url = "q=" . " $authors$years" . $title . $abstract . $fulltext . "$sorting" . "&p_=0";
+# Encode special characters
 $url =~ s/"/%22/g;
 $url =~ s/ +/%20/g;
 $url =~ s/,/%2C/g;
@@ -97,6 +99,32 @@ $url = "https://ui.adsabs.harvard.edu/search/" . ($opt_r ? $refstring : "") . $u
 print "Calling URL: $url\n" if $opt_d;
 exec "open '$url'";
 
+sub handle_year {
+  my $ys = shift;
+  die "Bad year argument $ys\n" unless $ys =~ /^([0-9]+)(-([0-9]+)?)?/;
+  ($y1,$y2) = ($1,$3);
+  $force_yr_range = 1 if $ys =~ /-$/;  # Dash at end, force range to today
+  $y1 = &normalize_year($y1);
+  $y2 = &normalize_year($y2);
+  push @years,$y1 if $y1;
+  push @years,$y2 if $y2;
+}
+
+sub normalize_year {
+  my $y = shift @_;
+  return "" if $y =~ /^ *$/;    # year was empty
+  if ($y < 100) {
+    # two digit year - check of 19.. or 20.. is meant
+    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+    $two_d_year = substr $year,1;
+    $yn = $y + ($y <= $two_d_year+1 ? 2000 : 1900);
+    print "Year $y interpreted as $yn\n" if $opt_d;
+    $y = $yn;
+  }
+  return $y;
+}
+  
+
 =pod
 
 =head1 NAME
@@ -109,17 +137,23 @@ ads [options] author [author2]... [startyear] [endyear]
 
 =head1 DESCRIPTION
 
-B<ads> is a commandline tool to fill a query to the ADS website.  The
+B<ads> is a commandline tool to fill a query to the ADS website. The
 tool will construct a query and send it to the default web browser.
-The tools takes author names and publishing years from the command
-line with as little fuss as possible, to make it easy to use.  Some
-search parameters can be changed with command line switches.
+The tool takes author names and publishing years from the command
+line with as little fuss as possible. Some search parameters can
+be changed with command line switches.
 
 The main reason for writing this tool is that the author intensely
 dislikes filling web forms on a regular basis.
 
-Number arguments are parsed as publishing year.  Two such years
-specify a range. String arguments are parsed as author names.
+Arguments containing letters are parsed as author names. Spaces in
+author names can be given as underscores `_`, or you can put the
+name in quotes.
+
+Number arguments are parsed as publishing year. Single or two-digit
+years are interpeted as 19.. or 20.. in a way that makes sense.
+A second year-like argument or something like '2012-2014' specifies
+a range. A year ending with `-` means starting from that year.
 
 =head1 OPTIONS
 
