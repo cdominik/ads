@@ -26,7 +26,7 @@ getopts('rds:t:a:f:');
 if ($opt_r) { $refereed = 1 }
 
 # Process the arguments 
-$yearre = "^[12][0-9][0-9][0-9]\$";
+$yearre = "^[12][0-9][0-9][0-9](-[12][0-9][0-9][0-9])?\$";
 while ($arg = shift @ARGV) {
   print "Processing argment $arg\n" if $opt_d;
   if ($arg =~ /^-([tafs])(.*)/) {
@@ -118,8 +118,8 @@ search parameters can be changed with command line switches.
 The main reason for writing this tool is that the author intensely
 dislikes filling web forms on a regular basis.
 
-Number arguments are parsed as start and end year.  String arguments
-are parsed as author names.
+Number arguments are parsed as publishing year.  Two such years
+specify a range. String arguments are parsed as author names.
 
 =head1 OPTIONS
 
