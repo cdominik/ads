@@ -137,11 +137,12 @@ ads [options] author [author2]... [startyear] [endyear]
 
 =head1 DESCRIPTION
 
-B<ads> is a commandline tool to fill a query to the ADS website. The
-tool will construct a query and send it to the default web browser.
-The tool takes author names and publishing years from the command
-line with as little fuss as possible. Some search parameters can
-be changed with command line switches.
+B<ads> is a commandline tool to pass a query to the website of the
+Astrophysical data system (ADS). The tool will construct a query and
+send it to the default web browser.  B<ads> takes author names and
+publishing years from the command line with as little fuss as
+possible. Some search parameters can be changed with command line
+switches.
 
 The main reason for writing this tool is that the author intensely
 dislikes filling web forms on a regular basis.
