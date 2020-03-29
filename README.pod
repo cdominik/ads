@@ -97,7 +97,7 @@ arguments after or mixed with the author and year arguments.
 
 =head1 AUTHOR
 
-Carsten Dominik    <dominik@uva.nl>
+Carsten Dominik    <dominik.dominik@gmail.com>
 
 This program is free software.  It it released under the rules like
 Perl itself, so wither the GNU General Public License, or the Artistic
