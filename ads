@@ -26,17 +26,17 @@ $sort_dir   = "desc";
 use Getopt::Std;
 getopts('rds:t:a:f:');
 
-if ($opt_r) { $refereed = 1 }
-
 # Process the arguments 
 while ($arg = shift @ARGV) {
   print "Processing argment $arg\n" if $opt_d;
-  if ($arg =~ /^-([tafs])(.*)/) {
+  if ($arg =~ /^-([rtafs])(.*)/) {
     # This is a delayed switch argument, lets process it.
     $value = length($2)>0 ? $2 : shift @ARGV;
     if ($1 eq "s") {
       # replace when sorting
       $cmd = sprintf("\$opt_%s = \"%s\";",$1,$value);
+    } elsif ($1 eq "r") {
+      $opt_r = 1;
     } else {
       # append when part of a text field search
       $cmd = sprintf("\$opt_%s .= \" %s\";",$1,$value);
@@ -151,10 +151,11 @@ Arguments containing letters are parsed as author names. Spaces in
 author names can be given as underscores `_`, or you can put the
 name in quotes.
 
-Number arguments are parsed as publishing year. Single or two-digit
-years are interpeted as 19.. or 20.. in a way that makes sense.
-A second year-like argument or something like '2012-2014' specifies
-a range. A year ending with `-` means starting from that year.
+Arguments that are numbers are parsed as publishing year. Single or
+two-digit years are interpeted years in the 20th and 21st century
+under the assumption that years are in the past, not in the future.  A
+second year-like argument or something like '2012-2014' specifies a
+range. A year ending with `-` means starting from that year.
 
 =head1 OPTIONS
 
@@ -201,20 +202,21 @@ Get papers by Dullemond and Dominik written in 2004.
     ads Dullemond Dominik,C 2004
 
 Same authors, but only the papers where Dullemond is first author, and
-in the range from 2000 to 2004.
+in the range from 2000 to 2004.  Note the two ways to specify a range.
 
     ads -r ^Dullemond Dominik 2000 2004
+    ads -r ^Dullemond Dominik 2000-2004
 
-Get papers of Ed van den Heuvel.  This example shows that spaces in
+Get papers of Ewine van Dishoeck.  This example shows that spaces in
 name field can be replaced by the underscore character, if you don't
 want to quote the name.
 
-    ads "van den heuvel,E"
-    ads van_den_heuvel,E
+    ads "van dishoeck,E"
+    ads van_dishoeck,E
 
-Same, sorted by normalized citations.
+Papers by Alexander Tielens, sorted by normalized citations.
 
-    ads -scn van_den_heuvel,E
+    ads -scn tielens,a
 
 For fun, and because I often think of additional constraints only after
 I have typed the names, this command also allows to give the switch
