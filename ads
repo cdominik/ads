@@ -241,7 +241,7 @@ want to quote the name.
 
 Papers by Alexander Tielens, sorted by normalized citations.
 
-    ads -scn tielens,a
+    ads -scn a.tielens
 
 For fun, and because I often think of additional constraints only after
 I have typed the names, this command also allows to give the switch
