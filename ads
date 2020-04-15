@@ -84,15 +84,9 @@ $sorting  = "&sort=$sort $sort_dir, bibcode desc";
 $refstring =  "filter_property_fq_property=AND&filter_property_fq_property=property%3A%22refereed%22&fq=%7B!type=aqp%20v%3D%24fq_property%7D&fq_property=(property%3A%22refereed%22)&";
 
 $url = "q=" . " $authors$years" . $title . $abstract . $fulltext . "$sorting" . "&p_=0";
+
 # Encode special characters
-$url =~ s/"/%22/g;
-$url =~ s/ +/%20/g;
-$url =~ s/,/%2C/g;
-$url =~ s/\$/%24/g;
-$url =~ s/\^/%5E/g;
-$url =~ s/:/%3A/g;
-$url =~ s/{/%7B/g;
-$url =~ s/}/%7D/g;
+$url = &encode_string($url);
 
 $url = "https://ui.adsabs.harvard.edu/search/" . ($opt_r ? $refstring : "") . $url;
 
@@ -123,7 +117,20 @@ sub normalize_year {
   }
   return $y;
 }
-  
+
+sub encode_string {
+  my $s = shift @_;
+  # Encode special characters
+  $s =~ s/"/%22/g;
+  $s =~ s/ +/%20/g;
+  $s =~ s/,/%2C/g;
+  $s =~ s/\$/%24/g;
+  $s =~ s/\^/%5E/g;
+  $s =~ s/:/%3A/g;
+  $s =~ s/{/%7B/g;
+  $s =~ s/}/%7D/g;
+  return $s;
+}  
 
 =pod
 
