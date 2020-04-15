@@ -88,6 +88,7 @@ $url = "q=" . " $authors$years" . $title . $abstract . $fulltext . "$sorting" . 
 # Encode special characters
 $url = &encode_string($url);
 
+# Put everything together
 $url = "https://ui.adsabs.harvard.edu/search/" . ($opt_r ? $refstring : "") . $url;
 
 print "Calling URL: $url\n" if $opt_d;
