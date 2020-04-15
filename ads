@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Version 2.0
+# Version 2.2
 
 # Usage information with:   perldoc ads
 
@@ -26,7 +26,7 @@ $sort_dir   = "desc";
 use Getopt::Std;
 getopts('rds:t:a:f:');
 
-# Process the arguments 
+# Process the arguments, and find late command line options as well
 while ($arg = shift @ARGV) {
   print "Processing argment $arg\n" if $opt_d;
   if ($arg =~ /^-([rtafs])(.*)/) {
@@ -49,8 +49,7 @@ while ($arg = shift @ARGV) {
     &handle_year($arg);
   } else {
     # Everything else is an author name
-    $arg=~s/_/ /g;
-    push @authors,$arg;
+    push @authors,normalize_author($arg);
   }
 }
 
@@ -98,6 +97,16 @@ elsif ($^O =~ /linux/i)   {  exec "xdg-open '$url'";     }
 elsif ($^O =~ /mswin/i)   {  exec "cmd /c start '$url'"; }
 elsif ($^O =~ /cygwin/i)  {  exec "cygstart '$url'";     }
 else                      {  exec "open '$url'";         } # Fallback option
+
+sub normalize_author {
+  # Put initials in the back, and convert underscore to space
+  my $a = shift;
+  $a = "$3,$1" if $a =~ /((\w+\.)+)(.+)/;
+  $a =~ s/_/ /g;
+  $a =~ s/^\s+//;
+  $a =~ s/\s+$//;
+  return $a;
+}
 
 sub handle_year {
   my $ys = shift;
@@ -160,12 +169,15 @@ switches.
 The main reason for writing this tool is that the author intensely
 dislikes filling web forms on a regular basis.
 
-Arguments containing letters are parsed as author names. Spaces in
-author names can be given as underscores `_`, or you can put the
-name in quotes.
+Arguments containing letters are parsed as author names. Necessary
+spaces in author names can be given as underscores `_`, or you can put
+the name in quotes. To be more specific than just a lastname, you can
+specify a first name like first.last (separated by dot) or last,first
+(separated by comma).  Only the initial letter of the first name is
+significant, so last,f and last,first are equivalent.
 
 Arguments that are numbers are parsed as publishing year. Single or
-two-digit years are interpeted years in the 20th and 21st century
+two-digit years are interpeted as years in the 20th and 21st century
 under the assumption that years are in the past, not in the future.  A
 second year-like argument or something like '2012-2014' specifies a
 range. A year ending with `-` means starting from that year.
