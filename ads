@@ -92,7 +92,12 @@ $url = &encode_string($url);
 $url = "https://ui.adsabs.harvard.edu/search/" . ($opt_r ? $refstring : "") . $url;
 
 print "Calling URL: $url\n" if $opt_d;
-exec "open '$url'";
+
+if    ($^O =~ /darwin/i)  {  exec "open '$url'";         }
+elsif ($^O =~ /linux/i)   {  exec "xdg-open '$url'";     }
+elsif ($^O =~ /mswin/i)   {  exec "cmd /c start '$url'"; }
+elsif ($^O =~ /cygwin/i)  {  exec "cygstart '$url'";     }
+else                      {  exec "open '$url'";         } # Fallback option
 
 sub handle_year {
   my $ys = shift;
