@@ -51,7 +51,7 @@ information about the effect of several B<-a> switches.
 
 =item B<-f> STRING
 
-AI< string to put into the fulltext search field. See also B<-t> for
+A string to put into the fulltext search field. See also B<-t> for
 information about the effect of several B<-f> switches.
 
 =item B<-o> OBJECT
