@@ -20,8 +20,8 @@ publishing years from the command line with as little fuss as
 possible. Additional search fields can be specified using command line
 switches.
 
-The main reason for writing this tool is that the author dislikes
-filling web forms on a regular basis.
+The main reason for the existence of this tool is that the author
+dislikes filling web forms on a regular basis.
 
 Most arguments are parsed as author names. Necessary spaces in author
 names may be given as underscores `_` to avoid having to type quotes
@@ -105,23 +105,23 @@ in the range from 2000 to 2004.
     ads -r ^Dullemond Dominik 2000-2004
     ads -r ^Dullemond Dominik 0-4
 
-Get papers of Ewine van Dishoeck. This example shows that spaces in
+Get papers of Ed van den Heuvel. This example shows that spaces in
 name field can be replaced by the underscore character, if you don't
 want to quote the name.
 
-    ads "van dishoeck,E"
-    ads van_dishoeck,E
+    ads "van den heuvel,E"
+    ads van_den_heuvel,E
 
-Papers by Alexander Tielens, sorted by normalized citations.
+Papers by Antonella Natta, sorted by normalized citations.
 
-    ads -sn a.tielens
+    ads -sn a.natta
 
 Unlike most unix commands, this command also allows to give the switch
 arguments after or mixed with the author and year arguments, because
 additional constraints sometimes present themselves while constructing
 the query.
 
-    ads tielens,a -t interstellar 1979 -sn 1980
+    ads natta,a -t protostar 1990 -sn 2000
 
 Find articles with the phrase "planet formation" in the abstract.
 
