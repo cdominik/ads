@@ -42,20 +42,11 @@ from that year.
 
 =item B<-a> STRING
 
-A string to put into the title search field. If there are several
-words in a single B<-t> argument, the title will be searched for the
-phrase. Use several B<-t> arguments to require the different words
-anywhere in the title.
-
-=item B<-a> STRING
-
-A string to put into the abstract search field. See also B<-t> for
-information about the effect of several B<-a> switches.
-
 =item B<-f> STRING
 
-A string to put into the fulltext search field. See also B<-t> for
-information about the effect of several B<-f> switches.
+A string to put into the title/abstract/fulltext search field. STRING
+will be searched for as a phrase.  Repeat the switch for multiple
+strings to be matched.
 
 =item B<-o> OBJECT
 
