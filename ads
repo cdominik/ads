@@ -1,44 +1,52 @@
 #!/usr/bin/perl
-# Version 2.2
+$version = 2.4;
 
 # Usage information with:   perldoc ads
 
 use List::Util qw[min max];
+
+if (not @ARGV or $ARGV[0] =~ /^--?h(elp)?$/) { &usage(); exit(0) }
 
 # Defaults for stuff that can be set with options
 $sort       = "date";
 $sort_dir   = "desc";
 
 %shash =  ( "c"   => "citation_count",      "cc"  => "citation_count",
-            "cn"  => "citation_count_norm", "ccn" => "citation_count_norm",
-            "nc"  => "citation_count_norm", "ncc" => "citation_count_norm",
-            "ac"  => "author_count",        "na"  => "author_count",
-            "cf"  => "classic_factor",
+            "n"   => "citation_count_norm",
+              "cn"  => "citation_count_norm", "ccn" => "citation_count_norm",
+              "nc"  => "citation_count_norm", "ncc" => "citation_count_norm",
+            "f"   => "classic_factor",      "cf"  => "classic_factor",
             "a"   => "first_author",        "fa"  => "first_author",
             "d"   => "date",
-            "ed"  => "entry_date",
+            "e"   => "entry_date",          "ed"  => "entry_date",
             "r"   => "read_count",          "rc"  => "read_count",
-            "s"   => "score" );
+            "s"   => "score",
+            "ac"  => "author_count",        "na"  => "author_count"
+  );
 %srevhash = reverse %shash;
 
-# Process command line options.  We do it by hand, to allow,
+# Process command line options. We do it by hand, to allow,
 # an arbitraty mix between switches and other args
 while ($arg = shift @ARGV) {
   print "Processing argment $arg\n" if $opt_d;
   if ($arg =~ /^-([rd])(.*)/) {
     # a switch without arguments
-    if ($1 eq "r") {$opt_r = 1} else {$opt_d=1}
+    if ($1 eq "r") {
+      $opt_r = 1; print "REFEREED only\n" if $opt_d;
+    } else {$opt_d=1}
     # Put the rest back onto ARGV
     unshift @ARGV,"-".$2 if $2;
   } elsif ($arg =~ /^-([tafsoi])(.*)/) {
     # A switch with a value
     $value = length($2)>0 ? $2 : shift @ARGV;
-    if    ($1 eq "s") {$opt_s = $value}
-    elsif ($1 eq "t") {push @title,   $value}
-    elsif ($1 eq "a") {push @abstract,$value}
-    elsif ($1 eq "f") {push @fulltext,$value}
-    elsif ($1 eq "o") {push @object,  $value}
-    elsif ($1 eq "i") {push @orcid,   $value}
+    if    ($1 eq "s") {$opt_s = $value;     ; print "SORTING:  $value=$shash{$value}\n" if $opt_d}
+    elsif ($1 eq "t") {push @title,   $value; print "TITLE:    $value\n" if $opt_d}
+    elsif ($1 eq "a") {push @abstract,$value; print "ABSTRACT: $value\n" if $opt_d}
+    elsif ($1 eq "f") {push @fulltext,$value; print "FULLTEXT: $value\n" if $opt_d}
+    elsif ($1 eq "o") {push @object,  $value; print "OBJECT:   $value\n" if $opt_d}
+    elsif ($1 eq "i") {push @orcid,   $value; print "ORCID:    $value\n" if $opt_d}
+  } elsif ($arg =~ /^-/) {
+    die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n"      
   } elsif ($arg =~ /^[0-9][-0-9]*$/) {
     # This is a year specification
     &handle_year($arg);
@@ -106,7 +114,12 @@ sub handle_author {
   $a =~ s/_/ /g;
   $a =~ s/^\s+//;
   $a =~ s/\s+$//;
-  printf "Adding author \"$a1\" as \"$a\"\n" if $opt_d;
+  $a =~ s/\.$//;
+  if ($a eq $a1) {
+    printf "Adding author \"$a\"\n" if $opt_d;
+  } else {
+    printf "Adding author \"$a1\" as \"$a\"\n" if $opt_d;
+  }
   push @authors,$a;
 }
 
@@ -117,8 +130,8 @@ sub handle_year {
   $force_yr_range = 1 if $ys =~ /-$/;  # Dash at end, force range to today
   $y1 = &normalize_year($y1);
   $y2 = &normalize_year($y2);
-  push @years,$y1 if $y1;
-  push @years,$y2 if $y2;
+  if ($y1) {push @years,$y1; print "YEAR: $y1\n" if $opt_d;}
+  if ($y2) {push @years,$y2; print "YEAR: $y2\n" if $opt_d;}
 }
 
 sub normalize_year {
@@ -137,7 +150,7 @@ sub normalize_year {
 
 sub encode_string {
   my $s = shift @_;
-  # Encode special characters
+  # Encode special characters and collapse multiple spaces
   $s =~ s/"/%22/g;
   $s =~ s/ +/%20/g;
   $s =~ s/,/%2C/g;
@@ -147,7 +160,27 @@ sub encode_string {
   $s =~ s/{/%7B/g;
   $s =~ s/}/%7D/g;
   return $s;
-}  
+}
+
+sub usage {
+  # print usage information
+  print <<'END';
+USAGE:    ads [options] [author]... [year[-endyear]] [options]
+OPTIONS:
+   -s a|c|n|s  Sorting strategy: author cite norm.cite score (default:date)
+   -t STRING   Title phrase
+   -a STRING   Abstract phrase
+   -f STRING   Fulltext phrase
+   -o OBJECT   Object name
+   -i ORCID    ORCID search
+   -r          refereed only
+EXAMPLE: ads dominik,c -t rolling -s nc -r 1995-2014
+* Options and arguments can be arbitrarily mixed, see EXAMPLE.
+* Switch repetition:               ads -t galaxy -t evolution
+* Switch and argument clusting:    ads -roVega -sc
+* Full manpage with:               perldoc ads
+END
+}
 
 =pod
 
@@ -157,13 +190,13 @@ B<ads> - commandline access to ADS (Astrophysical data system)
 
 =head1 SYNOPSIS
 
-ads [options] author [author2]... [startyear] [endyear]
+ads [options] [author]... [year] [endyear]
 
 =head1 DESCRIPTION
 
 B<ads> is a commandline tool to pass a query to the website of the
 Astrophysical data system (ADS). The tool will construct a query and
-send it to the default web browser.  B<ads> takes author names and
+send it to the default web browser. B<ads> takes author names and
 publishing years from the command line with as little fuss as
 possible. Some search parameters can be changed with command line
 switches.
@@ -171,18 +204,18 @@ switches.
 The main reason for writing this tool is that the author intensely
 dislikes filling web forms on a regular basis.
 
-Arguments containing letters are parsed as author names. Necessary
-spaces in author names can be given as underscores `_`, or you can put
-the name in quotes. To be more specific than just a last name, you can
-specify a first name like first.last (separated by dot) or last,first
-(separated by comma).  Only the initial letter of the first name is
-significant, so last,f and last,first are equivalent.
+Most arguments are parsed as author names. Necessary spaces in author
+names can be given as underscores `_`, or be presented in quotes. To
+be more specific than just a last name, a first name or initial can be
+given like first.last (separated by dot) or last,first (separated by
+comma). Only the initial letter of the first name is significant, so
+last,f and last,first are equivalent.
 
-Arguments that are numbers are parsed as publishing year. Single or
-two-digit years are interpreted as years in the 20th and 21st century
-under the assumption that years are in the past, not in the future.  A
-second year-like argument or something like '2012-2014' specifies a
-range. A year ending with `-` means starting from that year.
+Arguments that are numbers are interpreted as publishing year. Single
+or two-digit years are moved into the 20th and 21st century under the
+assumption that years are at most 1 year into the future. A second
+year-like argument or something like '2012-2014' specifies a range. A
+year ending with `-` means starting from that year.
 
 =head1 OPTIONS
 
@@ -192,7 +225,7 @@ range. A year ending with `-` means starting from that year.
 
 A string to put into the title search field. If there are several
 words in a single B<-t> argument, the title will be searched for the
-phrase.  Use several B<-t> arguments to require the different words
+phrase. Use several B<-t> arguments to require the different words
 anywhere in the title.
 
 =item B<-a> STRING
@@ -207,33 +240,34 @@ information about the effect of several B<-f> switches.
 
 =item B<-o> OBJECT
 
-An object to search for.  Use multiple B-o>
+An object to search for. Use multiple B-o>
 switched for multiple objects.
 
 =item B<-i> ORCID
 
-Search for an author by ORCID identifyer.  Several B<-i> switched can
+Search for an author by ORCID identifier. Several B<-i> switched can
 be given.
 
 =item B<-s> SORTING
 
-Sorting mode for matched entries.  DEFAULT is 'date', to sort by date.
-Values can be given in full, or be abbreviated.  The allowed values
-and abbreviations are:
- 
-   d                => date                    # This is the default
-   a  fa            => first_author
-   c  cc            => citation_count
-   cn ccn nc ncc    => citation_count_norm
-   s                => score
+Sorting mode for matched entries. DEFAULT is 'date', to sort by date.
+Values can be given in full, or be abbreviated. The relevant allowed
+values and abbreviations are (for more see code):
+
+   d                  => date                    # This is the default
+   a  fa              => first_author
+   c  cc              => citation_count
+   n  cn ccn nc ncc   => citation_count_norm
+   s                  => score
 
 =item B<-r>
 
-Only list refereed sources.  Default is to list also unrefereed.
+Only list refereed sources. Default is to list also unrefereed.
 
 =item B<-d>
 
-Print debugging information
+Print debugging information. Make this the first command line
+argument in order to be most useful.
 
 =back
 
@@ -244,12 +278,12 @@ Get papers by Dullemond and Dominik written in 2004.
     ads Dullemond Dominik,C 2004
 
 Same authors, but only the papers where Dullemond is first author, and
-in the range from 2000 to 2004.  Note the two ways to specify a range.
+in the range from 2000 to 2004. Note the two ways to specify a range.
 
     ads -r ^Dullemond Dominik 2000 2004
     ads -r ^Dullemond Dominik 2000-2004
 
-Get papers of Ewine van Dishoeck.  This example shows that spaces in
+Get papers of Ewine van Dishoeck. This example shows that spaces in
 name field can be replaced by the underscore character, if you don't
 want to quote the name.
 
@@ -279,7 +313,7 @@ abstract.
 
 Carsten Dominik    <dominik.dominik@gmail.com>
 
-This program is free software.  It it released under the rules like
+This program is free software. It it released under the rules like
 Perl itself, so wither the GNU General Public License, or the Artistic
 License.
 
