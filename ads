@@ -200,6 +200,10 @@ B<ads> - commandline access to ADS (Astrophysical data system)
 
 ads [options] [author]... [year] [endyear]
 
+=head1 INSTALLATION
+
+Make the F<ads> file executable and put in on your execution path.
+
 =head1 DESCRIPTION
 
 B<ads> is a commandline tool to pass a query to the website of the
