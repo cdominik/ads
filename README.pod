@@ -24,11 +24,11 @@ The main reason for writing this tool is that the author dislikes
 filling web forms on a regular basis.
 
 Most arguments are parsed as author names. Necessary spaces in author
-names can be given as underscores `_`, or be presented in quotes. To
-be more specific than just a last name, a first name or initial can be
-given like first.last (separated by dot) or last,first (separated by
-comma). Only the initial letter of the first name is significant, so
-last,f and last,first are equivalent.
+names may be given as underscores `_` to avoid having to type quotes
+around the name. To be more specific than just a last name, a first
+name or initial can be given like first.last (separated by dot) or
+last,first (separated by comma). Only the initial letter of the first
+name is significant, so last,f and last,first are equivalent.
 
 Arguments that are numbers are interpreted as publishing years. Single
 or two-digit years are moved into the 20th and 21st century under the
