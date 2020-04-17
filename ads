@@ -30,13 +30,15 @@ while ($arg = shift @ARGV) {
     if ($1 eq "r") {$opt_r = 1} else {$opt_d=1}
     # Put the rest back onto ARGV
     unshift @ARGV,"-".$2 if $2;
-  } elsif ($arg =~ /^-([tafs])(.*)/) {
+  } elsif ($arg =~ /^-([tafsoi])(.*)/) {
     # A switch with a value
     $value = length($2)>0 ? $2 : shift @ARGV;
     if    ($1 eq "s") {$opt_s = $value}
     elsif ($1 eq "t") {push @title,   $value}
     elsif ($1 eq "a") {push @abstract,$value}
     elsif ($1 eq "f") {push @fulltext,$value}
+    elsif ($1 eq "o") {push @object,  $value}
+    elsif ($1 eq "i") {push @orcid,   $value}
   } elsif ($arg =~ /^[0-9][-0-9]*$/) {
     # This is a year specification
     &handle_year($arg);
@@ -58,9 +60,11 @@ if (@years) {
 while ($a=shift(@authors)) { $authors .= " author:\"$a\""; }
 $authors =~ s/ //;
 
-$title .= sprintf(' title:"%s"',shift(@title))    while @title;
-$title .= sprintf(' abs:"%s"'  ,shift(@abstract)) while @abstract;
-$title .= sprintf(' full:"%s"' ,shift(@fulltext)) while @fulltext;
+$title    .= sprintf(' title:"%s"'  ,shift(@title))    while @title;
+$abstract .= sprintf(' abs:"%s"'    ,shift(@abstract)) while @abstract;
+$fulltext .= sprintf(' full:"%s"'   ,shift(@fulltext)) while @fulltext;
+$object   .= sprintf(' object:"%s"' ,shift(@object))   while @object;
+$orcid    .= sprintf(' orcid:"%s"'  ,shift(@orcid))    while @orcid;
 
 if ($opt_s) {
   if ($shash{$opt_s}) {
@@ -75,7 +79,8 @@ $sorting  = "&sort=$sort $sort_dir, bibcode desc";
 
 $refstring =  "filter_property_fq_property=AND&filter_property_fq_property=property%3A%22refereed%22&fq=%7B!type=aqp%20v%3D%24fq_property%7D&fq_property=(property%3A%22refereed%22)&";
 
-$url = "q=" . " $authors$years" . $title . $abstract . $fulltext
+$url = "q=" . " $authors$years"
+  . $title . $abstract . $fulltext . $object . $orcid
   . "$sorting" . "&p_=0";
 
 # Encode special characters
@@ -200,17 +205,27 @@ information about the effect of several B<-a> switches.
 A string to put into the fulltext search field. See also B<-t> for
 information about the effect of several B<-f> switches.
 
+=item B<-o> OBJECT
+
+An object to search for.  Use multiple B-o>
+switched for multiple objects.
+
+=item B<-i> ORCID
+
+Search for an author by ORCID identifyer.  Several B<-i> switched can
+be given.
+
 =item B<-s> SORTING
 
 Sorting mode for matched entries.  DEFAULT is 'date', to sort by date.
 Values can be given in full, or be abbreviated.  The allowed values
 and abbreviations are:
  
-   d              => date                      # This is the default
-   a  fa          => first_author
-   c  cc          => citation_count
-   cn ccn nc ncc  => citation_count_norm
-   s              => score
+   d                => date                    # This is the default
+   a  fa            => first_author
+   c  cc            => citation_count
+   cn ccn nc ncc    => citation_count_norm
+   s                => score
 
 =item B<-r>
 
