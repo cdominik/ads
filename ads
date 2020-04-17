@@ -1,12 +1,12 @@
 #!/usr/bin/perl
-$version = 2.4;
+$version = 2.5;
 
 # Usage information with:   ads -h
 # Full manpage with:        perldoc ads
 
 use List::Util qw[min max];
 
-if (not @ARGV or $ARGV[0] =~ /^--?h(elp)?$/) { &usage(); exit(0) }
+if (not @ARGV or $ARGV[0] =~ /^--?h(elp)?$/) { &usage(); exit(0); }
 
 # Defaults for stuff that can be set with options
 $sort       = "date";
@@ -24,12 +24,12 @@ $sort_dir   = "desc";
             ac=> "author_count",        na  => "ac"
   );
 
-# Process command line options. We do it by hand, to allow,
+# Process command line options. We do it by hand, to allow
 # an arbitraty mix between switches and other args
 while ($arg = shift @ARGV) {
   print "Processing argment $arg\n" if $opt_d;
   if ($arg =~ /^-([rd])(.*)/) {
-    # a switch without arguments
+    # a switch without argument
     if ($1 eq "r") {
       $opt_r = 1; print "REFEREED only\n" if $opt_d;
     } else {$opt_d=1}
@@ -42,8 +42,8 @@ while ($arg = shift @ARGV) {
     elsif ($1 eq "t") {push @title,   $value; print "TITLE:    $value\n" if $opt_d}
     elsif ($1 eq "a") {push @abstract,$value; print "ABSTRACT: $value\n" if $opt_d}
     elsif ($1 eq "f") {push @fulltext,$value; print "FULLTEXT: $value\n" if $opt_d}
-    elsif ($1 eq "o") {push @object,  $value; print "OBJECT:   $value\n" if $opt_d}
-    elsif ($1 eq "i") {push @orcid,   &normalize_orcid($value); printf "ORCID:    $orcid[0]\n" if $opt_d}
+    elsif ($1 eq "o") {push @object,  &fix_spaces($value); print "OBJECT:   $object[0]\n" if $opt_d}
+    elsif ($1 eq "i") {push @orcid,   &fix_orcid($value);  print "ORCID:    $orcid[0]\n"  if $opt_d}
   } elsif ($arg =~ /^-/) {
     die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n"      
   } elsif ($arg =~ /^[0-9][-0-9]*$/) {
@@ -98,13 +98,20 @@ $url = &encode_string($url);
 $url = "https://ui.adsabs.harvard.edu/search/"
   . ($opt_r ? $refstring : "") . $url;
 
+# Send the URL to the browser
 print "Calling URL: $url\n" if $opt_d;
+if    ($^O =~ /darwin/i) { exec "open '$url'";         }
+elsif ($^O =~ /linux/i)  { exec "xdg-open '$url'";     }
+elsif ($^O =~ /mswin/i)  { exec "cmd /c start '$url'"; }
+elsif ($^O =~ /cygwin/i) { exec "cygstart '$url'";     }
+else                     { exec "open '$url'";         } # Fallback option
 
-if    ($^O =~ /darwin/i)  {  exec "open '$url'";         }
-elsif ($^O =~ /linux/i)   {  exec "xdg-open '$url'";     }
-elsif ($^O =~ /mswin/i)   {  exec "cmd /c start '$url'"; }
-elsif ($^O =~ /cygwin/i)  {  exec "cygstart '$url'";     }
-else                      {  exec "open '$url'";         } # Fallback option
+# And .... we are done
+
+# ==========================================================================
+# ==========================================================================
+
+# Subroutines
 
 sub handle_author {
   # Put initials in the back, and convert underscore to space
@@ -124,6 +131,7 @@ sub handle_author {
 }
 
 sub handle_year {
+  # Interpret a year specification
   my $ys = shift;
   die "Bad year argument $ys\n" unless $ys =~ /^([0-9]+)(-([0-9]+)?)?/;
   ($y1,$y2) = ($1,$3);
@@ -135,6 +143,7 @@ sub handle_year {
 }
 
 sub normalize_year {
+  # Interpret shortened year specifications
   my $y = shift @_;
   return "" if $y =~ /^ *$/;    # year was empty
   if ($y < 100) {
@@ -148,7 +157,8 @@ sub normalize_year {
   return $y;
 }
 
-sub normalize_orcid {
+sub fix_orcid {
+  # Add leading zeros to an incomplete ORCID
   my $o = shift @_;
   my $template = "0000-0000-0000-0000";
   my $lo = length($o);
@@ -158,8 +168,20 @@ sub normalize_orcid {
   return $o;
 }
 
-sub get_sorting {
+sub fix_spaces {
+  # Replace underscore with space
   my $s = shift @_;
+  $s =~ s/_/ /g;
+  return $s;
+}
+
+sub get_sorting {
+  # Repeatedly apply the sorting hash until we get to the full name.
+  # This has to do with the way the sorting hash %shash points from
+  # each abbreviation to the canonical abbreviation, and then from the
+  # canonical abbreviation to the full sorting keyword.
+  my $s = shift @_;
+  my $s1;
   $s1 = $s;
   $s = $shash{$s} while length($s) < 4;
   print "Sorting option '$s1' translated to '$s'\n" if $opt_d and $s1 ne $s;
@@ -167,8 +189,8 @@ sub get_sorting {
 }
 
 sub encode_string {
-  my $s = shift @_;
   # Encode special characters and collapse multiple spaces
+  my $s = shift @_;
   $s =~ s/"/%22/g;
   $s =~ s/ +/%20/g;
   $s =~ s/,/%2C/g;
@@ -181,7 +203,7 @@ sub encode_string {
 }
 
 sub usage {
-  # print usage information
+  # Print usage information
   print <<'END';
 USAGE:    ads [options] [author]... [year[-endyear]] [options]
 OPTIONS:
@@ -223,11 +245,11 @@ possible. Additional search fields can be specified using command line
 switches, still a lot faster than the web form.
 
 Alphabetic arguments are parsed as author names. Quotes are only
-necessary to protect whitespace inside a name. ALternatively, replace
-whitespace with and underscore C<_>. A first name or initial can be
-added like C<first.last> (separated by dot) or C<last,first>
-(separated by comma). Only the initial letter of the first name is
-significant, so C<last,f> and C<last,first> are equivalent.
+necessary to protect whitespace inside a name. Alternatively, replace
+spaces with underscore C<_> characters. A first name can be added like
+C<first.last> (separated by dot) or C<last,first> (separated by
+comma). Only the initial letter of the first name is significant, so
+C<last,f> and C<last,first> are equivalent.
 
 Arguments that are numbers are interpreted as publishing years. Single
 or two-digit years are moved into the 20th and 21st century under the
@@ -259,8 +281,8 @@ information about the effect of several B<-f> switches.
 
 =item B<-o> OBJECT
 
-An object to search for. Use multiple B<-o>
-switches for multiple objects.
+An astronomical object to search for. Use multiple B<-o> switches for
+multiple objects.  Use C<_> instead of space characters.
 
 =item B<-i> ORCID
 

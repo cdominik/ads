@@ -21,11 +21,11 @@ possible. Additional search fields can be specified using command line
 switches, still a lot faster than the web form.
 
 Alphabetic arguments are parsed as author names. Quotes are only
-necessary to protect whitespace inside a name. ALternatively, replace
-whitespace with and underscore C<_>. A first name or initial can be
-added like C<first.last> (separated by dot) or C<last,first>
-(separated by comma). Only the initial letter of the first name is
-significant, so C<last,f> and C<last,first> are equivalent.
+necessary to protect whitespace inside a name. Alternatively, replace
+spaces with underscore C<_> characters. A first name can be added like
+C<first.last> (separated by dot) or C<last,first> (separated by
+comma). Only the initial letter of the first name is significant, so
+C<last,f> and C<last,first> are equivalent.
 
 Arguments that are numbers are interpreted as publishing years. Single
 or two-digit years are moved into the 20th and 21st century under the
@@ -57,8 +57,8 @@ information about the effect of several B<-f> switches.
 
 =item B<-o> OBJECT
 
-An object to search for. Use multiple B<-o>
-switches for multiple objects.
+An astronomical object to search for. Use multiple B<-o> switches for
+multiple objects.  Use C<_> instead of space characters.
 
 =item B<-i> ORCID
 
