@@ -53,19 +53,18 @@ Like B<-t>, but match in the FULL TEXT.
 
 =item B<-o> OBJECT
 
-An astronomical object to search for. Use multiple B<-o> switches for
-multiple objects.  Use C<_> instead of space characters.
+An astronomical object to search for. Quote OBJECT to protect
+whitespace, or replace spaces with underscore characters.
 
 =item B<-i> ORCID
 
-Search for an author by ORCID identifier. Several B<-i> switches can
-be given, and leading zeros in an ORCID can be left out.
+Search for an author by ORCID identifier. Leading zeros in an ORCID
+can be left out.
 
 =item B<-s> SORTING
 
-Sorting mode for matched entries. The DEFAULT is 'date', to sort by
-date.  Values can be given in full, or be abbreviated. The allowed
-values and abbreviations are:
+Sorting mode for matched entries. Values can be given in full, or be
+abbreviated. The modes and abbreviations are:
 
   d                  => date                # This is the default
   a  fa              => first_author
@@ -75,13 +74,12 @@ values and abbreviations are:
 
 =item B<-r>
 
-Only list refereed sources. Default is to list also unrefereed
-sources.
+List only refereed sources.
 
 =item B<-d>
 
-Print debugging information. Make this the first command line
-argument in order to be useful.
+Print debugging information. This needs to be the first command line
+argument.
 
 =back
 
