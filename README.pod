@@ -40,6 +40,8 @@ from that year.
 
 =item B<-t> STRING
 
+=item B<-a> STRING
+
 A string to put into the title search field. If there are several
 words in a single B<-t> argument, the title will be searched for the
 phrase. Use several B<-t> arguments to require the different words
