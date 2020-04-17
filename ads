@@ -167,14 +167,14 @@ sub usage {
   print <<'END';
 USAGE:    ads [options] [author]... [year[-endyear]] [options]
 OPTIONS:
-   -s a|c|n|s  Sorting strategy: author cite norm.cite score (default:date)
+   -s a|c|n|s  Sorting: author cite normcite score (default:date)
    -t STRING   Title phrase
    -a STRING   Abstract phrase
    -f STRING   Fulltext phrase
    -o OBJECT   Object name
    -i ORCID    ORCID search
    -r          refereed only
-EXAMPLE: ads dominik,c -t rolling -s nc -r 1995-2014
+EXAMPLE: ads dominik,c -t rolling -s n -r 1995-2014
 * Options and arguments can be arbitrarily mixed, see EXAMPLE.
 * Switch repetition:               ads -t galaxy -t evolution
 * Switch and argument clusting:    ads -roVega -sc
@@ -235,7 +235,7 @@ information about the effect of several B<-a> switches.
 
 =item B<-f> STRING
 
-A string to put into the fulltext search field. See also B<-t> for
+AI< string to put into the fulltext search field. See also B<-t> for
 information about the effect of several B<-f> switches.
 
 =item B<-o> OBJECT
@@ -278,10 +278,11 @@ Get papers by Dullemond and Dominik written in 2004.
     ads Dullemond Dominik,C 2004
 
 Same authors, but only the papers where Dullemond is first author, and
-in the range from 2000 to 2004. Note the two ways to specify a range.
+in the range from 2000 to 2004.
 
     ads -r ^Dullemond Dominik 2000 2004
     ads -r ^Dullemond Dominik 2000-2004
+    ads -r ^Dullemond Dominik 0-4
 
 Get papers of Ewine van Dishoeck. This example shows that spaces in
 name field can be replaced by the underscore character, if you don't
@@ -292,22 +293,23 @@ want to quote the name.
 
 Papers by Alexander Tielens, sorted by normalized citations.
 
-    ads -scn a.tielens
+    ads -sn a.tielens
 
-For fun, and because I often think of additional constraints only after
-I have typed the names, this command also allows to give the switch
-arguments after or mixed with the author and year arguments.
+Unlike most unix commands, this command also allows to give the switch
+arguments after or mixed with the author and year arguments, because
+additional constraints sometimes present themselves while constructing
+the query.
 
-    ads tielens,a -t interstellar 1979 -scc 1980
+    ads tielens,a -t interstellar 1979 -sn 1980
 
-Find articles with the phrase "galaxy evolution" in the abstract.
+Find articles with the phrase "planet formation" in the abstract.
 
-    ads -a "galaxy evolution"
+    ads -a "planet formation"
 
-Find articles with both "galaxy" and "evolution" anywhere in the
+Find articles with both "planet" and "system" anywhere in the
 abstract.
 
-    ads -agalaxy -a evolution
+    ads -aplanet -a system
 
 =head1 AUTHOR
 
