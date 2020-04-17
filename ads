@@ -240,7 +240,7 @@ information about the effect of several B<-f> switches.
 
 =item B<-o> OBJECT
 
-An object to search for. Use multiple B-o>
+An object to search for. Use multiple B<-o>
 switched for multiple objects.
 
 =item B<-i> ORCID
@@ -251,8 +251,8 @@ be given.
 =item B<-s> SORTING
 
 Sorting mode for matched entries. DEFAULT is 'date', to sort by date.
-Values can be given in full, or be abbreviated. The relevant allowed
-values and abbreviations are (for more see code):
+Values can be given in full, or be abbreviated. The allowed values and
+abbreviations are:
 
    d                  => date                    # This is the default
    a  fa              => first_author
