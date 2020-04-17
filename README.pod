@@ -14,21 +14,18 @@ ads [options] [author]... [year] [endyear]
 =head1 DESCRIPTION
 
 B<ads> is a commandline tool to pass a query to the website of the
-Astrophysical Data System (ADS). The tool will construct a query and
-send it to the default web browser. B<ads> takes author names and
+Astrophysical Data System (ADS). The tool constructs a query and
+sends it to the default web browser. B<ads> takes author names and
 publishing years from the command line with as little fuss as
 possible. Additional search fields can be specified using command line
-switches.
+switches, still a lot faster than the web form.
 
-The main reason for the existence of this tool is that the author
-dislikes filling web forms on a regular basis.
-
-Most arguments are parsed as author names. Necessary spaces in author
-names may be given as underscores `_` to avoid having to type quotes
-around the name. To be more specific than just a last name, a first
-name or initial can be given like first.last (separated by dot) or
-last,first (separated by comma). Only the initial letter of the first
-name is significant, so last,f and last,first are equivalent.
+Alphabetic arguments are parsed as author names. Quotes are only
+necessary to protect whitespace inside a name. ALternatively, replace
+whitespace with and underscore C<_>. A first name or initial can be
+added like C<first.last> (separated by dot) or C<last,first>
+(separated by comma). Only the initial letter of the first name is
+significant, so C<last,f> and C<last,first> are equivalent.
 
 Arguments that are numbers are interpreted as publishing years. Single
 or two-digit years are moved into the 20th and 21st century under the
