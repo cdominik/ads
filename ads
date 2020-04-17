@@ -43,7 +43,7 @@ while ($arg = shift @ARGV) {
     elsif ($1 eq "a") {push @abstract,$value; print "ABSTRACT: $value\n" if $opt_d}
     elsif ($1 eq "f") {push @fulltext,$value; print "FULLTEXT: $value\n" if $opt_d}
     elsif ($1 eq "o") {push @object,  $value; print "OBJECT:   $value\n" if $opt_d}
-    elsif ($1 eq "i") {push @orcid,   $value; print "ORCID:    $value\n" if $opt_d}
+    elsif ($1 eq "i") {push @orcid,   &normalize_orcid($value); printf "ORCID:    $orcid[0]\n" if $opt_d}
   } elsif ($arg =~ /^-/) {
     die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n"      
   } elsif ($arg =~ /^[0-9][-0-9]*$/) {
@@ -148,6 +148,16 @@ sub normalize_year {
   return $y;
 }
 
+sub normalize_orcid {
+  my $o = shift @_;
+  my $template = "0000-0000-0000-0000";
+  my $lo = length($o);
+  my $lt = length($template);
+  $o = substr($template,0,-$lo) . $o if $lo < $lt;
+  die "Invalid ORCID $o\n" unless $o =~ /^\d{4}-\d{4}-\d{4}-\d{4}$/;
+  return $o;
+}
+
 sub get_sorting {
   my $s = shift @_;
   $s1 = $s;
@@ -185,7 +195,7 @@ OPTIONS:
 EXAMPLE: ads dominik,c -t rolling -s n -r 1995-2014
 * Options and arguments can be arbitrarily mixed, see EXAMPLE.
 * Switch repetition:               ads -t galaxy -t evolution
-* Switch and argument clusting:    ads -roVega -sc
+* Switch and argument clustering:  ads -roVega -sc
 * Full manpage with:               perldoc ads
 END
 }
@@ -194,7 +204,7 @@ END
 
 =head1 NAME
 
-B<ads> - commandline access to ADS (Astrophysical data system)
+B<ads> - commandline access to ADS (Astrophysical Data System)
 
 =head1 SYNOPSIS
 
@@ -206,14 +216,14 @@ ads [options] [author]... [year] [endyear]
 =head1 DESCRIPTION
 
 B<ads> is a commandline tool to pass a query to the website of the
-Astrophysical data system (ADS). The tool will construct a query and
+Astrophysical Data System (ADS). The tool will construct a query and
 send it to the default web browser. B<ads> takes author names and
 publishing years from the command line with as little fuss as
-possible. Some search parameters can be changed with command line
+possible. Additional search fields can be specified using command line
 switches.
 
-The main reason for writing this tool is that the author intensely
-dislikes filling web forms on a regular basis.
+The main reason for writing this tool is that the author dislikes
+filling web forms on a regular basis.
 
 Most arguments are parsed as author names. Necessary spaces in author
 names can be given as underscores `_`, or be presented in quotes. To
@@ -222,11 +232,12 @@ given like first.last (separated by dot) or last,first (separated by
 comma). Only the initial letter of the first name is significant, so
 last,f and last,first are equivalent.
 
-Arguments that are numbers are interpreted as publishing year. Single
+Arguments that are numbers are interpreted as publishing years. Single
 or two-digit years are moved into the 20th and 21st century under the
-assumption that years are at most 1 year into the future. A second
-year-like argument or something like '2012-2014' specifies a range. A
-year ending with `-` means starting from that year.
+assumption that the specified year is intended to be at most 1 year
+into the future. A second year-like argument or something like
+'2012-2014' specifies a range. A year ending with `-` means starting
+from that year.
 
 =head1 OPTIONS
 
@@ -257,7 +268,7 @@ switches for multiple objects.
 =item B<-i> ORCID
 
 Search for an author by ORCID identifier. Several B<-i> switches can
-be given.
+be given.  Leading zeros in an ORCID can be left out.
 
 =item B<-s> SORTING
 
@@ -273,7 +284,8 @@ abbreviations are:
 
 =item B<-r>
 
-Only list refereed sources. Default is to list also unrefereed.
+Only list refereed sources. Default is to list also unrefereed
+sources.
 
 =item B<-d>
 
