@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 $version = 2.4;
 
-# Usage information with:   perldoc ads
+# Usage information with:   ads -h
+# Full manpage with:        perldoc ads
 
 use List::Util qw[min max];
 
@@ -11,19 +12,17 @@ if (not @ARGV or $ARGV[0] =~ /^--?h(elp)?$/) { &usage(); exit(0) }
 $sort       = "date";
 $sort_dir   = "desc";
 
-%shash =  ( "c"   => "citation_count",      "cc"  => "citation_count",
-            "n"   => "citation_count_norm",
-              "cn"  => "citation_count_norm", "ccn" => "citation_count_norm",
-              "nc"  => "citation_count_norm", "ncc" => "citation_count_norm",
-            "f"   => "classic_factor",      "cf"  => "classic_factor",
-            "a"   => "first_author",        "fa"  => "first_author",
-            "d"   => "date",
-            "e"   => "entry_date",          "ed"  => "entry_date",
-            "r"   => "read_count",          "rc"  => "read_count",
-            "s"   => "score",
-            "ac"  => "author_count",        "na"  => "author_count"
+%shash =  ( c => "citation_count",      cc  => "c",
+            n => "citation_count_norm", cn  => "n", nc  => "n",
+                                        ccn => "n", ncc => "n",
+            f => "classic_factor",      cf  => "f",
+            a => "first_author",        fa  => "a",
+            d => "date",
+            e => "entry_date",          ed  => "e",
+            r => "read_count",          rc  => "r",
+            s => "score",
+            ac=> "author_count",        na  => "ac"
   );
-%srevhash = reverse %shash;
 
 # Process command line options. We do it by hand, to allow,
 # an arbitraty mix between switches and other args
@@ -39,7 +38,7 @@ while ($arg = shift @ARGV) {
   } elsif ($arg =~ /^-([tafsoi])(.*)/) {
     # A switch with a value
     $value = length($2)>0 ? $2 : shift @ARGV;
-    if    ($1 eq "s") {$opt_s = $value;     ; print "SORTING:  $value=$shash{$value}\n" if $opt_d}
+    if ($1 eq "s") {$opt_s = $value;          print "SORTING:  $value\n" if $opt_d}
     elsif ($1 eq "t") {push @title,   $value; print "TITLE:    $value\n" if $opt_d}
     elsif ($1 eq "a") {push @abstract,$value; print "ABSTRACT: $value\n" if $opt_d}
     elsif ($1 eq "f") {push @fulltext,$value; print "FULLTEXT: $value\n" if $opt_d}
@@ -75,11 +74,12 @@ $object   .= sprintf(' object:"%s"' ,shift(@object))   while @object;
 $orcid    .= sprintf(' orcid:"%s"'  ,shift(@orcid))    while @orcid;
 
 if ($opt_s) {
-  if ($shash{$opt_s}) {
-    $sort = $shash{$opt_s};
-  } elsif ($srevhash{$opt_s}) {
-    $sort = $opt_s;
+  unless ($shash{$opt_s}) {    
+    print STDERR "Invalid sorting option '$opt_s', falling back to date sorting\n";
+    $opt_s = "date";
   }
+  # get the official sorting key out of the hash, if necessary by a chain
+  $sort = &get_sorting($opt_s);
 }
 
 if ($sort eq "first_author") {$sort_dir = "asc";} # change sort direction
@@ -146,6 +146,14 @@ sub normalize_year {
     $y = $yn;
   }
   return $y;
+}
+
+sub get_sorting {
+  my $s = shift @_;
+  $s1 = $s;
+  $s = $shash{$s} while length($s) < 4;
+  print "Sorting option '$s1' translated to '$s'\n" if $opt_d and $s1 ne $s;
+  return $s;
 }
 
 sub encode_string {
