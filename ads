@@ -3,10 +3,9 @@
 
 # Usage information with:   perldoc ads
 
-# Defaults for stuff that can be set with options
-
 use List::Util qw[min max];
 
+# Defaults for stuff that can be set with options
 $sort       = "date";
 $sort_dir   = "desc";
 
@@ -15,41 +14,35 @@ $sort_dir   = "desc";
             "nc"  => "citation_count_norm", "ncc" => "citation_count_norm",
             "ac"  => "author_count",        "na"  => "author_count",
             "cf"  => "classic_factor",
-            "a"   => "first_author",        "fa"  => "first_author", #      make ascending the default
+            "a"   => "first_author",        "fa"  => "first_author",
             "d"   => "date",
             "ed"  => "entry_date",
             "r"   => "read_count",          "rc"  => "read_count",
             "s"   => "score" );
 %srevhash = reverse %shash;
 
-# Process command line options
-use Getopt::Std;
-getopts('rds:t:a:f:');
-
-# Process the arguments, and find late command line options as well
+# Process command line options.  We do it by hand, to allow,
+# an arbitraty mix between switches and other args
 while ($arg = shift @ARGV) {
   print "Processing argment $arg\n" if $opt_d;
-  if ($arg =~ /^-([rtafs])(.*)/) {
-    # This is a delayed switch argument, lets process it.
+  if ($arg =~ /^-([rd])(.*)/) {
+    # a switch without arguments
+    if ($1 eq "r") {$opt_r = 1} else {$opt_d=1}
+    # Put the rest back onto ARGV
+    unshift @ARGV,"-".$2 if $2;
+  } elsif ($arg =~ /^-([tafs])(.*)/) {
+    # A switch with a value
     $value = length($2)>0 ? $2 : shift @ARGV;
-    if ($1 eq "s") {
-      # replace when sorting
-      $cmd = sprintf("\$opt_%s = \"%s\";",$1,$value);
-    } elsif ($1 eq "r") {
-      $opt_r = 1;
-    } else {
-      # append when part of a text field search
-      $cmd = sprintf("\$opt_%s .= \" %s\";",$1,$value);
-    }
-    print "delayed arg: $cmd\n" if $opt_d;
-    eval $cmd;
-
+    if    ($1 eq "s") {$opt_s = $value}
+    elsif ($1 eq "t") {push @title,   $value}
+    elsif ($1 eq "a") {push @abstract,$value}
+    elsif ($1 eq "f") {push @fulltext,$value}
   } elsif ($arg =~ /^[0-9][-0-9]*$/) {
     # This is a year specification
     &handle_year($arg);
   } else {
     # Everything else is an author name
-    push @authors,normalize_author($arg);
+    &handle_author($arg);
   }
 }
 
@@ -65,9 +58,9 @@ if (@years) {
 while ($a=shift(@authors)) { $authors .= " author:\"$a\""; }
 $authors =~ s/ //;
 
-if ($opt_t) { $title = ' title:"' . $opt_t . '"'; }
-if ($opt_a) { $abstract = ' abs:"' . $opt_a . '"'; }
-if ($opt_f) { $fulltext = ' full:"' . $opt_f . '"'; }
+$title .= sprintf(' title:"%s"',shift(@title))    while @title;
+$title .= sprintf(' abs:"%s"'  ,shift(@abstract)) while @abstract;
+$title .= sprintf(' full:"%s"' ,shift(@fulltext)) while @fulltext;
 
 if ($opt_s) {
   if ($shash{$opt_s}) {
@@ -82,13 +75,15 @@ $sorting  = "&sort=$sort $sort_dir, bibcode desc";
 
 $refstring =  "filter_property_fq_property=AND&filter_property_fq_property=property%3A%22refereed%22&fq=%7B!type=aqp%20v%3D%24fq_property%7D&fq_property=(property%3A%22refereed%22)&";
 
-$url = "q=" . " $authors$years" . $title . $abstract . $fulltext . "$sorting" . "&p_=0";
+$url = "q=" . " $authors$years" . $title . $abstract . $fulltext
+  . "$sorting" . "&p_=0";
 
 # Encode special characters
 $url = &encode_string($url);
 
 # Put everything together
-$url = "https://ui.adsabs.harvard.edu/search/" . ($opt_r ? $refstring : "") . $url;
+$url = "https://ui.adsabs.harvard.edu/search/"
+  . ($opt_r ? $refstring : "") . $url;
 
 print "Calling URL: $url\n" if $opt_d;
 
@@ -98,14 +93,16 @@ elsif ($^O =~ /mswin/i)   {  exec "cmd /c start '$url'"; }
 elsif ($^O =~ /cygwin/i)  {  exec "cygstart '$url'";     }
 else                      {  exec "open '$url'";         } # Fallback option
 
-sub normalize_author {
+sub handle_author {
   # Put initials in the back, and convert underscore to space
   my $a = shift;
+  my $a1 = $a;
   $a = "$3,$1" if $a =~ /((\w+\.)+)(.+)/;
   $a =~ s/_/ /g;
   $a =~ s/^\s+//;
   $a =~ s/\s+$//;
-  return $a;
+  printf "Adding author \"$a1\" as \"$a\"\n" if $opt_d;
+  push @authors,$a;
 }
 
 sub handle_year {
@@ -171,13 +168,13 @@ dislikes filling web forms on a regular basis.
 
 Arguments containing letters are parsed as author names. Necessary
 spaces in author names can be given as underscores `_`, or you can put
-the name in quotes. To be more specific than just a lastname, you can
+the name in quotes. To be more specific than just a last name, you can
 specify a first name like first.last (separated by dot) or last,first
 (separated by comma).  Only the initial letter of the first name is
 significant, so last,f and last,first are equivalent.
 
 Arguments that are numbers are parsed as publishing year. Single or
-two-digit years are interpeted as years in the 20th and 21st century
+two-digit years are interpreted as years in the 20th and 21st century
 under the assumption that years are in the past, not in the future.  A
 second year-like argument or something like '2012-2014' specifies a
 range. A year ending with `-` means starting from that year.
@@ -188,15 +185,20 @@ range. A year ending with `-` means starting from that year.
 
 =item B<-t> STRING
 
-A string to put into the title search field.
+A string to put into the title search field. If there are several
+words in a single B<-t> argument, the title will be searched for the
+phrase.  Use several B<-t> arguments to require the different words
+anywhere in the title.
 
 =item B<-a> STRING
 
-A string to put into the abstract search field.
+A string to put into the abstract search field. See also B<-t> for
+information about the effect of several B<-a> switches.
 
 =item B<-f> STRING
 
-A string to put into the fulltext search field.
+A string to put into the fulltext search field. See also B<-t> for
+information about the effect of several B<-f> switches.
 
 =item B<-s> SORTING
 
@@ -204,7 +206,7 @@ Sorting mode for matched entries.  DEFAULT is 'date', to sort by date.
 Values can be given in full, or be abbreviated.  The allowed values
 and abbreviations are:
  
-   d              => date                       This is the default
+   d              => date                      # This is the default
    a  fa          => first_author
    c  cc          => citation_count
    cn ccn nc ncc  => citation_count_norm
@@ -248,6 +250,15 @@ I have typed the names, this command also allows to give the switch
 arguments after or mixed with the author and year arguments.
 
     ads tielens,a -t interstellar 1979 -scc 1980
+
+Find articles with the phrase "galaxy evolution" in the abstract.
+
+    ads -a "galaxy evolution"
+
+Find articles with both "galaxy" and "evolution" anywhere in the
+abstract.
+
+    ads -agalaxy -a evolution
 
 =head1 AUTHOR
 

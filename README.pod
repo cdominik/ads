@@ -22,13 +22,13 @@ dislikes filling web forms on a regular basis.
 
 Arguments containing letters are parsed as author names. Necessary
 spaces in author names can be given as underscores `_`, or you can put
-the name in quotes. To be more specific than just a lastname, you can
+the name in quotes. To be more specific than just a last name, you can
 specify a first name like first.last (separated by dot) or last,first
 (separated by comma).  Only the initial letter of the first name is
 significant, so last,f and last,first are equivalent.
 
 Arguments that are numbers are parsed as publishing year. Single or
-two-digit years are interpeted as years in the 20th and 21st century
+two-digit years are interpreted as years in the 20th and 21st century
 under the assumption that years are in the past, not in the future.  A
 second year-like argument or something like '2012-2014' specifies a
 range. A year ending with `-` means starting from that year.
@@ -39,15 +39,20 @@ range. A year ending with `-` means starting from that year.
 
 =item B<-t> STRING
 
-A string to put into the title search field.
+A string to put into the title search field. If there are several
+words in a single B<-t> argument, the title will be searched for the
+phrase.  Use several B<-t> arguments to require the different words
+anywhere in the title.
 
 =item B<-a> STRING
 
-A string to put into the abstract search field.
+A string to put into the abstract search field. See also B<-t> for
+information about the effect of several B<-a> switches.
 
 =item B<-f> STRING
 
-A string to put into the fulltext search field.
+A string to put into the fulltext search field. See also B<-t> for
+information about the effect of several B<-f> switches.
 
 =item B<-s> SORTING
 
@@ -55,7 +60,7 @@ Sorting mode for matched entries.  DEFAULT is 'date', to sort by date.
 Values can be given in full, or be abbreviated.  The allowed values
 and abbreviations are:
  
-   d              => date                       This is the default
+   d              => date                      # This is the default
    a  fa          => first_author
    c  cc          => citation_count
    cn ccn nc ncc  => citation_count_norm
@@ -99,6 +104,15 @@ I have typed the names, this command also allows to give the switch
 arguments after or mixed with the author and year arguments.
 
     ads tielens,a -t interstellar 1979 -scc 1980
+
+Find articles with the phrase "galaxy evolution" in the abstract.
+
+    ads -a "galaxy evolution"
+
+Find articles with both "galaxy" and "evolution" anywhere in the
+abstract.
+
+    ads -agalaxy -a evolution
 
 =head1 AUTHOR
 
