@@ -262,11 +262,18 @@ from that year.
 
 =over 5
 
-=item B<-t> STRING     B<-a> STRING     B<-f> STRING
+=item B<-t> STRING
 
-Strings to put into the title/abstract/fulltext search fields. STRING
-will be searched for as a phrase.  Repeat the switch for multiple
-strings to be matched.
+String to matched in the TITLE field, as a phrase.  Repeat the switch
+for multiple strings to be matched.
+
+=item B<-a> STRING
+
+Like B<-t>, but match in the ABSTRACT.
+
+=item B<-f> STRING
+
+Like B<-t>, but match in the FULL TEXT.
 
 =item B<-o> OBJECT
 
@@ -276,19 +283,19 @@ multiple objects.  Use C<_> instead of space characters.
 =item B<-i> ORCID
 
 Search for an author by ORCID identifier. Several B<-i> switches can
-be given.  Leading zeros in an ORCID can be left out.
+be given, and leading zeros in an ORCID can be left out.
 
 =item B<-s> SORTING
 
-Sorting mode for matched entries. DEFAULT is 'date', to sort by date.
-Values can be given in full, or be abbreviated. The allowed values and
-abbreviations are:
+Sorting mode for matched entries. The DEFAULT is 'date', to sort by
+date.  Values can be given in full, or be abbreviated. The allowed
+values and abbreviations are:
 
-   d                  => date                    # This is the default
-   a  fa              => first_author
-   c  cc              => citation_count
-   n  cn ccn nc ncc   => citation_count_norm
-   s                  => score
+  d                  => date                # This is the default
+  a  fa              => first_author
+  c  cc              => citation_count
+  n  cn ccn nc ncc   => citation_count_norm
+  s                  => score
 
 =item B<-r>
 
@@ -298,7 +305,7 @@ sources.
 =item B<-d>
 
 Print debugging information. Make this the first command line
-argument in order to be most useful.
+argument in order to be useful.
 
 =back
 
