@@ -57,11 +57,11 @@ information about the effect of several B<-f> switches.
 =item B<-o> OBJECT
 
 An object to search for. Use multiple B<-o>
-switched for multiple objects.
+switches for multiple objects.
 
 =item B<-i> ORCID
 
-Search for an author by ORCID identifier. Several B<-i> switched can
+Search for an author by ORCID identifier. Several B<-i> switches can
 be given.
 
 =item B<-s> SORTING
