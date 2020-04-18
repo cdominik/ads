@@ -28,11 +28,11 @@ $sort_dir   = "desc";
 # an arbitraty mix between switches and other args
 while ($arg = shift @ARGV) {
   print "Processing argment $arg\n" if $opt_d;
-  if ($arg =~ /^-([rd])(.*)/) {
+  if ($arg =~ /^-([rdc])(.*)/) {
     # a switch without argument
-    if ($1 eq "r") {
-      $opt_r = 1; print "REFEREED only\n" if $opt_d;
-    } else {$opt_d=1}
+    if ($1 eq "r")    { $opt_r = 1;  print "REFEREED only\n"      if $opt_d }
+    elsif ($1 eq "c") { $opt_s = $1; print "Interpreted as -sc\n" if $opt_d }
+    else              { $opt_d = 1;  print "Debugging on\n" }
     # Put the rest back onto ARGV
     unshift @ARGV,"-".$2 if $2;
   } elsif ($arg =~ /^-([tafsoi])(.*)/) {
@@ -214,7 +214,7 @@ OPTIONS:
    -o OBJECT   Object name
    -i ORCID    ORCID search
    -r          refereed only
-EXAMPLE: ads dominik,c -t rolling -s n -r 1995-2014
+EXAMPLE: ads dominik,c -t rolling -sn -r 1995-2014
 * Options and arguments can be arbitrarily mixed, see EXAMPLE.
 * Switch repetition:               ads -t galaxy -t evolution
 * Switch and argument clustering:  ads -roVega -sc
@@ -287,14 +287,18 @@ can be left out.
 
 =item B<-s> SORTING
 
-Sorting mode for matched entries. Values can be given in full, or be
-abbreviated. The modes and abbreviations are:
+Sorting mode for matched entries. The mode can be given as a single
+letter, in full, or abbreviated.
 
-  d                  => date                # This is the default
-  a  fa              => first_author
-  c  cc              => citation_count
-  n  cn ccn nc ncc   => citation_count_norm
-  s                  => score
+  d  => date                  # This is the default
+  a  => first_author          # abbreviations: fa
+  c  => citation_count        # abbreviations: cc
+  n  => citation_count_norm   # abbreviations: cn ccn nc ncc
+  s  => score
+
+=item B<-c>
+
+Same as B<-sc>, sorting by citations.
 
 =item B<-r>
 

@@ -63,14 +63,18 @@ can be left out.
 
 =item B<-s> SORTING
 
-Sorting mode for matched entries. Values can be given in full, or be
-abbreviated. The modes and abbreviations are:
+Sorting mode for matched entries. The mode can be given as a single
+letter, in full, or abbreviated.
 
-  d                  => date                # This is the default
-  a  fa              => first_author
-  c  cc              => citation_count
-  n  cn ccn nc ncc   => citation_count_norm
-  s                  => score
+  d  => date                  # This is the default
+  a  => first_author          # abbreviations: fa
+  c  => citation_count        # abbreviations: cc
+  n  => citation_count_norm   # abbreviations: cn ccn nc ncc
+  s  => score
+
+=item B<-c>
+
+Same as B<-sc>, sorting by citations.
 
 =item B<-r>
 
