@@ -263,8 +263,8 @@ C<first.last> (separated by dot) or C<last,first> (separated by
 comma). Only the initial letter of the first name is significant, so
 C<last,f> and C<last,first> are equivalent.
 
-Arguments that are numbers are interpreted as publishing years. Single
-or two-digit years are moved into the 20th and 21st century under the
+Numerical arguments are interpreted as publishing years. Single or
+two-digit years are moved into the 20th and 21st century under the
 assumption that the specified year is intended to be at most 1 year
 into the future. A second year-like argument or something like
 '2012-2014' specifies a range. A year ending with `-` means starting
