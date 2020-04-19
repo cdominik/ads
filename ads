@@ -256,14 +256,14 @@ publishing years from the command line with as little fuss as
 possible. Additional search fields and options can be specified using
 command line switches, which also is a lot faster than the web form.
 
-Alphabetic arguments are parsed as author names. Quotes are only
+I<Alphabetic> arguments are parsed as author names. Quotes are only
 necessary to protect whitespace inside a name. Alternatively, replace
 spaces with underscore C<_> characters. A first name can be added like
 C<first.last> (separated by dot) or C<last,first> (separated by
 comma). Only the initial letter of the first name is significant, so
 C<last,f> and C<last,first> are equivalent.
 
-Numerical arguments are interpreted as publishing years. Single or
+I<Numerical> arguments are interpreted as publishing years. Single or
 two-digit years are moved into the 20th and 21st century under the
 assumption that the specified year is intended to be at most 1 year
 into the future. A second year-like argument or something like
@@ -329,8 +329,8 @@ Get papers by Dullemond and Dominik written in 2004.
 
     ads Dullemond Dominik,C 2004
 
-Same authors, but only the papers where Dullemond is first author, and
-in the range from 2000 to 2004.
+Same authors, but only refereed papers where Dullemond is first
+author, and in the range from 2000 to 2004.
 
     ads -r ^Dullemond Dominik 2000 2004
     ads -r ^Dullemond Dominik 2000-2004
