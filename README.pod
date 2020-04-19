@@ -63,7 +63,7 @@ to sort by date. B<-c> is a shorthand for B<-sc>, see below.
 
 List only refereed sources.
 
-=item B<-A> B<-P> B<-G>
+=item B<-A>, B<-P>, B<-G>
 
 Narrow to I<astronomy>, I<physics>, or I<general> database,
 respectively.
