@@ -218,18 +218,19 @@ sub usage {
   print <<'END';
 USAGE:    ads [options] [author]... [year[-endyear]] [options]
 OPTIONS:
-   -s a|c|n|s  Sorting: author cite normcite score (default:date)
    -t STRING   Title phrase
    -a STRING   Abstract phrase
    -f STRING   Fulltext phrase
    -o OBJECT   Object name
    -i ORCID    ORCID search
-   -r          refereed only
-   -A -P -G    narrow to astronomy, physics or general database
+   -c          Sort by citation count instead of date (same as -sc)
+   -r          Refereed only
+   -A -P -G    Narrow to astronomy, physics or general database
+   -s a|c|n|s  Sorting: author cite normcite score (default:date)
 EXAMPLE: ads dominik,c -t rolling -sn -r 1995-2014
 * Options and arguments can be arbitrarily mixed, see EXAMPLE.
 * Switch repetition:               ads -t galaxy -t evolution
-* Switch and argument clustering:  ads -roVega -sc
+* Switch and argument clustering:  ads -roVega -sn
 * Full manpage with:               perldoc ads
 END
 }
@@ -290,6 +291,20 @@ whitespace, or replace spaces with underscore characters.
 Search for an author by ORCID identifier. Leading zeros in the ORCID
 can be left out.
 
+=item B<-c>
+
+Sort matched bibliographic sources by citation count.  The default is
+to sort by date. B<-c> is a shorthand for B<-sc>, see below.
+
+=item B<-r>
+
+List only refereed sources.
+
+=item B<-A> B<-P> B<-G>
+
+Narrow to I<astronomy>, I<physics>, or I<general> database,
+respectively.
+
 =item B<-s> SORTING
 
 Sorting mode for matched entries. The mode can be given as a single
@@ -300,18 +315,6 @@ letter, in full, or abbreviated.
   c  => citation_count        # abbreviations: cc
   n  => citation_count_norm   # abbreviations: cn ccn nc ncc
   s  => score
-
-=item B<-c>
-
-Same as B<-sc>, meaning to sort articles by number of citations.
-
-=item B<-r>
-
-List only refereed sources.
-
-=item B<-A> B<-P> B<-G>
-
-Narrow to I<astronomy>, I<physics>, or I<general> database.
 
 =item B<-d>
 
