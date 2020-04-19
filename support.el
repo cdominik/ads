@@ -1,3 +1,7 @@
+;; These are just some functions I use to deconstruct ADS queries that
+;; have been created by the Webform interface, to understnad the API
+;; better.  This file is not needed to run `ads'.
+
 (defconst ads-encode-alist
   '(("\"" . "%22")
     (" " . "%20")

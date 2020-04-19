@@ -365,8 +365,7 @@ abstract.
 Carsten Dominik    <dominik.dominik@gmail.com>
 
 This program is free software. It it released under the same rules as
-Perl itself, so wither the GNU General Public License, or the Artistic
-License.
+Perl itself, see https://dev.perl.org/licenses/.
 
 =cut
 
