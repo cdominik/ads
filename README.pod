@@ -6,7 +6,7 @@ B<ads> - commandline access to ADS (Astrophysical Data System)
 
 =head1 SYNOPSIS
 
-Make the F<ads> file executable and put in on your execution path.
+Make the F<ads> file executable and put it on your execution path.
 
   ads [options] [author]... [year] [endyear]
 
