@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$version = 2.5;
+$version = 2.6;
 
 # Usage information with:   ads -h
 # Full manpage with:        perldoc ads
@@ -8,44 +8,53 @@ use List::Util qw[min max];
 
 if (not @ARGV or $ARGV[0] =~ /^--?h(elp)?$/) { &usage(); exit(0); }
 
-# Defaults for stuff that can be set with options
-$sort       = "date";
-$sort_dir   = "desc";
+# Some Defaults and option hashes
 
-%shash =  ( c => "citation_count",      cc  => "c",
-            n => "citation_count_norm", cn  => "n", nc  => "n",
-                                        ccn => "n", ncc => "n",
-            f => "classic_factor",      cf  => "f",
-            a => "first_author",        fa  => "a",
-            d => "date",
-            e => "entry_date",          ed  => "e",
-            r => "read_count",          rc  => "r",
-            s => "score",
-            ac=> "author_count",        na  => "ac"
+# Collections to be searched.  This can be P for "physics", A for "astronomy",
+# or G for general.  Leave empty to search all by default.
+$database = "";
+%dhash = ( A => "astronomy", P => "physics", G => "general" );
+
+# Sorting mode and direction
+$sort     = "date";  $sort_dir = "desc";
+%shash = ( c => "citation_count",      cc  => "c",
+           n => "citation_count_norm", cn  => "n", nc  => "n",
+                                       ccn => "n", ncc => "n",
+           f => "classic_factor",      cf  => "f",
+           a => "first_author",        fa  => "a",
+           d => "date",
+           e => "entry_date",          ed  => "e",
+           r => "read_count",          rc  => "r",
+           s => "score",
+           ac=> "author_count",        na  => "ac"
   );
 
 # Process command line options. We do it by hand, to allow
 # an arbitraty mix between switches and other args
 while ($arg = shift @ARGV) {
   print "Processing argment $arg\n" if $opt_d;
-  if ($arg =~ /^-([rdc])(.*)/) {
+  if ($arg =~ /^-([rdcAPG])(.*)/) {
     # a switch without argument
     if ($1 eq "r")    { $opt_r = 1;  print "REFEREED only\n"      if $opt_d }
     elsif ($1 eq "c") { $opt_s = $1; print "Interpreted as -sc\n" if $opt_d }
+    elsif ($1 eq "A" or $1 eq "P" or $1 eq "G") {
+      $database = $1;
+      print "Selecting $dhash{$1} database\n" if $opt_d;
+    }
     else              { $opt_d = 1;  print "Debugging on\n" }
     # Put the rest back onto ARGV
     unshift @ARGV,"-".$2 if $2;
   } elsif ($arg =~ /^-([tafsoi])(.*)/) {
     # A switch with a value
     $value = length($2)>0 ? $2 : shift @ARGV;
-    if ($1 eq "s") {$opt_s = $value;          print "SORTING:  $value\n" if $opt_d}
+    if ($1 eq "s")    {$opt_s = $value;       print "SORTING:  $value\n" if $opt_d}
     elsif ($1 eq "t") {push @title,   $value; print "TITLE:    $value\n" if $opt_d}
     elsif ($1 eq "a") {push @abstract,$value; print "ABSTRACT: $value\n" if $opt_d}
     elsif ($1 eq "f") {push @fulltext,$value; print "FULLTEXT: $value\n" if $opt_d}
     elsif ($1 eq "o") {push @object,  &fix_spaces($value); print "OBJECT:   $object[0]\n" if $opt_d}
     elsif ($1 eq "i") {push @orcid,   &fix_orcid($value);  print "ORCID:    $orcid[0]\n"  if $opt_d}
   } elsif ($arg =~ /^-/) {
-    die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n"      
+    die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n";
   } elsif ($arg =~ /^[0-9][-0-9]*$/) {
     # This is a year specification
     &handle_year($arg);
@@ -82,13 +91,15 @@ if ($opt_s) {
   $sort = &get_sorting($opt_s);
 }
 
+$database = "&fq=database:$dhash{$database}" if $database;
+
 if ($sort eq "first_author") {$sort_dir = "asc";} # change sort direction
 $sorting  = "&sort=$sort $sort_dir, bibcode desc";
 
 $refstring =  "filter_property_fq_property=AND&filter_property_fq_property=property%3A%22refereed%22&fq=%7B!type=aqp%20v%3D%24fq_property%7D&fq_property=(property%3A%22refereed%22)&";
 
 $url = "q=" . " $authors$years"
-  . $title . $abstract . $fulltext . $object . $orcid
+  . $title . $abstract . $fulltext . $object . $orcid . $database
   . "$sorting" . "&p_=0";
 
 # Encode special characters
@@ -214,6 +225,7 @@ OPTIONS:
    -o OBJECT   Object name
    -i ORCID    ORCID search
    -r          refereed only
+   -A -P -G    narrow to astronomy, physics or general database
 EXAMPLE: ads dominik,c -t rolling -sn -r 1995-2014
 * Options and arguments can be arbitrarily mixed, see EXAMPLE.
 * Switch repetition:               ads -t galaxy -t evolution
@@ -231,9 +243,8 @@ B<ads> - commandline access to ADS (Astrophysical Data System)
 =head1 SYNOPSIS
 
 Make the F<ads> file executable and put in on your execution path.
-Then use the command like this:
 
-ads [options] [author]... [year] [endyear]
+  ads [options] [author]... [year] [endyear]
 
 =head1 DESCRIPTION
 
@@ -304,10 +315,14 @@ Same as B<-sc>, sorting by citations.
 
 List only refereed sources.
 
+=item B<-A> B<-P> B<-G>
+
+Narrow to I<astronomy>, I<physics>, or I<general> database.
+
 =item B<-d>
 
 Print debugging information. This needs to be the first command line
-argument.
+argument to be effective.
 
 =back
 
@@ -324,9 +339,8 @@ in the range from 2000 to 2004.
     ads -r ^Dullemond Dominik 2000-2004
     ads -r ^Dullemond Dominik 0-4
 
-Get papers of Ed van den Heuvel. This example shows that spaces in
-name field can be replaced by the underscore character, if you don't
-want to quote the name.
+Get papers of Ed van den Heuvel, a name with spaces that need to be
+protected.
 
     ads "van den heuvel,E"
     ads van_den_heuvel,E
@@ -335,12 +349,11 @@ Papers by Antonella Natta, sorted by normalized citations.
 
     ads -sn a.natta
 
-Unlike most unix commands, this command also allows to give the switch
-arguments after or mixed with the author and year arguments, because
-additional constraints sometimes present themselves while constructing
-the query.
+B<ads> allows to freely mix switch arguments with author and year
+arguments, because additional constraints sometimes present themselves
+while constructing the query.
 
-    ads natta,a -t protostar 1990 -sn 2000
+    ads natta,a -sn 1990 2000 -t protostar
 
 Find articles with the phrase "planet formation" in the abstract.
 

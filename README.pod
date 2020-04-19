@@ -7,9 +7,8 @@ B<ads> - commandline access to ADS (Astrophysical Data System)
 =head1 SYNOPSIS
 
 Make the F<ads> file executable and put in on your execution path.
-Then use the command like this:
 
-ads [options] [author]... [year] [endyear]
+  ads [options] [author]... [year] [endyear]
 
 =head1 DESCRIPTION
 
@@ -80,10 +79,14 @@ Same as B<-sc>, sorting by citations.
 
 List only refereed sources.
 
+=item B<-A> B<-P> B<-G>
+
+Narrow to I<astronomy>, I<physics>, or I<general> database.
+
 =item B<-d>
 
 Print debugging information. This needs to be the first command line
-argument.
+argument to be effective.
 
 =back
 
@@ -100,9 +103,8 @@ in the range from 2000 to 2004.
     ads -r ^Dullemond Dominik 2000-2004
     ads -r ^Dullemond Dominik 0-4
 
-Get papers of Ed van den Heuvel. This example shows that spaces in
-name field can be replaced by the underscore character, if you don't
-want to quote the name.
+Get papers of Ed van den Heuvel, a name with spaces that need to be
+protected.
 
     ads "van den heuvel,E"
     ads van_den_heuvel,E
@@ -111,12 +113,11 @@ Papers by Antonella Natta, sorted by normalized citations.
 
     ads -sn a.natta
 
-Unlike most unix commands, this command also allows to give the switch
-arguments after or mixed with the author and year arguments, because
-additional constraints sometimes present themselves while constructing
-the query.
+B<ads> allows to freely mix switch arguments with author and year
+arguments, because additional constraints sometimes present themselves
+while constructing the query.
 
-    ads natta,a -t protostar 1990 -sn 2000
+    ads natta,a -sn 1990 2000 -t protostar
 
 Find articles with the phrase "planet formation" in the abstract.
 
