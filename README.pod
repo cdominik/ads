@@ -110,8 +110,7 @@ Papers by Antonella Natta, sorted by normalized citations.
     ads -sn a.natta
 
 B<ads> allows to freely mix switch arguments with author and year
-arguments, because additional constraints sometimes present themselves
-while constructing the query.
+arguments.
 
     ads natta,a -sn 1990 2000 -t protostar
 
