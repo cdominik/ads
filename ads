@@ -249,11 +249,11 @@ Make the F<ads> file executable and put it on your execution path.
 =head1 DESCRIPTION
 
 B<ads> is a commandline tool to pass a query to the website of the
-Astrophysical Data System (ADS). The tool constructs a query and
+Astrophysical Data System (ADS). The tool constructs a query URL and
 sends it to the default web browser. B<ads> takes author names and
 publishing years from the command line with as little fuss as
-possible. Additional search fields can be specified using command line
-switches, still a lot faster than the web form.
+possible. Additional search fields and options can be specified using
+command line switches, which also is a lot faster than the web form.
 
 Alphabetic arguments are parsed as author names. Quotes are only
 necessary to protect whitespace inside a name. Alternatively, replace
@@ -273,18 +273,12 @@ from that year.
 
 =over 5
 
-=item B<-t> STRING
+=item B<-t> STRING, B<-a> STRING, B<-f> STRING   
 
-String to matched in the TITLE field, as a phrase.  Repeat the switch
-for multiple strings to be matched.
-
-=item B<-a> STRING
-
-Like B<-t>, but match in the ABSTRACT.
-
-=item B<-f> STRING
-
-Like B<-t>, but match in the FULL TEXT.
+String phrase to be matched in the I<title>, I<abstract>, or
+I<fulltext>, respectively, of a bibliographic source.  Multiple
+B<-t>/B<-a>/B<-f> switches with strings can be given to retrieve only
+sources that match all requested strings.
 
 =item B<-o> OBJECT
 
@@ -293,7 +287,7 @@ whitespace, or replace spaces with underscore characters.
 
 =item B<-i> ORCID
 
-Search for an author by ORCID identifier. Leading zeros in an ORCID
+Search for an author by ORCID identifier. Leading zeros in the ORCID
 can be left out.
 
 =item B<-s> SORTING
@@ -309,7 +303,7 @@ letter, in full, or abbreviated.
 
 =item B<-c>
 
-Same as B<-sc>, sorting by citations.
+Same as B<-sc>, meaning to sort articles by number of citations.
 
 =item B<-r>
 
@@ -368,7 +362,7 @@ abstract.
 
 Carsten Dominik    <dominik.dominik@gmail.com>
 
-This program is free software. It it released under the rules like
+This program is free software. It it released under the same rules as
 Perl itself, so wither the GNU General Public License, or the Artistic
 License.
 
