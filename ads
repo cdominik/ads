@@ -384,7 +384,7 @@ arguments.
 
 Papers by Muro-Arena, Ginski, and Benisty on the object SR 21.
 
-    ads ginski muro-arena sr_21
+    ads ginski muro-arena benisty sr_21
 
 Find articles with the phrase "planet formation" in the abstract.
 
