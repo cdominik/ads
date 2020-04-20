@@ -17,25 +17,27 @@ Astrophysical Data System (ADS). The tool constructs a query URL and
 sends it to the default web browser. B<ads> takes author names and
 publishing years from the command line with as little fuss as
 possible. Additional search fields and options can be specified using
-command line switches, which also is a lot faster than the web form.
+command line switches.
 
-I<Alphabetic> arguments are parsed as author names. Quotes are only
-necessary to protect whitespace inside a name. Alternatively, replace
-spaces with underscore C<_> characters. A first name can be added like
-C<first.last> (separated by dot) or C<last,first> (separated by
-comma). Only the initial letter of the first name is significant, so
-C<last,f> and C<last,first> are equivalent.
-
-I<Numerical> arguments are interpreted as publishing years. Single or
-two-digit years are moved into the 20th and 21st century under the
-assumption that the specified year is intended to be at most 1 year
-into the future. A second year-like argument or something like
-'2012-2014' specifies a range. A year ending with `-` means starting
-from that year.
-
-=head1 OPTIONS
+=head1 ARGUMENTS and OPTIONS
 
 =over 5
+
+=item AUTHOR NAMES
+
+I<Alphabetic> arguments are parsed as author names. To protect
+whitespace in names, use quotes or replace space characters by
+underscore C<_> characters. A first name initial can be added like
+C<f.last> (separated by dot) or C<last,f> (separated by comma).  If
+necessary, an exact author match can be done using B<-i> ORCID.
+
+=item PUBLISHING YEARS
+
+I<Numerical> arguments are interpreted as publishing years. Single or
+two-digit years are moved into the 20th/21st century, such that the
+year is the current year (+1) or earlier. Two numerical arguments or
+an argument like '2012-2014' specify a range. '2004-' means since
+2004, '-2004' means until 2004.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 

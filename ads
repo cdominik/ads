@@ -53,11 +53,11 @@ while ($arg = shift @ARGV) {
     elsif ($1 eq "f") {push @fulltext,$value; print "FULLTEXT: $value\n" if $opt_d}
     elsif ($1 eq "o") {push @object,  &fix_spaces($value); print "OBJECT:   $object[0]\n" if $opt_d}
     elsif ($1 eq "i") {push @orcid,   &fix_orcid($value);  print "ORCID:    $orcid[0]\n"  if $opt_d}
-  } elsif ($arg =~ /^-/) {
-    die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n";
-  } elsif ($arg =~ /^[0-9][-0-9]*$/) {
+  } elsif ($arg =~ /^-?[0-9][-0-9]*$/) {
     # This is a year specification
     &handle_year($arg);
+  } elsif ($arg =~ /^-/) {
+    die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n";
   } else {
     # Everything else is an author name
     &handle_author($arg);
@@ -67,9 +67,11 @@ while ($arg = shift @ARGV) {
 if (@years) {
   $y1 = min @years;
   $y2 = max @years;
+  print "tears $y1 $y2>>$force_yr_range<<\n";
   $years = " year:";
-  if ($force_yr_range) {$years .= "$y1-"}
-  elsif ($y2 > $y1) {$years .= "$y1-$y2"}
+  if    ($y2 > $y1)                  {$years .= "$y1-$y2"}
+  elsif ($force_yr_range eq "since") {$years .= "$y1-"}
+  elsif ($force_yr_range eq "until") {$years .= "-$y2"}
   else {$years .= $y1}
 }
 
@@ -108,9 +110,9 @@ $url = &encode_string($url);
 # Put everything together
 $url = "https://ui.adsabs.harvard.edu/search/"
   . ($opt_r ? $refstring : "") . $url;
-
 # Send the URL to the browser
 print "Calling URL: $url\n" if $opt_d;
+exit(0);
 if    ($^O =~ /darwin/i) { exec "open '$url'";         }
 elsif ($^O =~ /linux/i)  { exec "xdg-open '$url'";     }
 elsif ($^O =~ /mswin/i)  { exec "cmd /c start '$url'"; }
@@ -144,9 +146,24 @@ sub handle_author {
 sub handle_year {
   # Interpret a year specification
   my $ys = shift;
-  die "Bad year argument $ys\n" unless $ys =~ /^([0-9]+)(-([0-9]+)?)?/;
-  ($y1,$y2) = ($1,$3);
-  $force_yr_range = 1 if $ys =~ /-$/;  # Dash at end, force range to today
+  my $y1,$y2;
+  die "Bad year argument $ys\n" unless $ys =~ /^(-)?(\d+)(-(\d+)?)?/;
+  if ($ys =~ /^(\d+)$/) {
+    # Single year
+    $y2 = $1;
+  } elsif ($ys =~ /^-(\d+)$/) {
+    # UNTIL range
+    $force_yr_range = "until";
+    $y2 = $1;
+  } elsif ($ys =~ /^(\d+)-$/) {
+    # SINCE range
+    print "here\n";
+    $force_yr_range = "since";
+    $y1 = $1;
+  } elsif ($ys =~ /^(\d+)-(\d+)$/) {
+    # full range
+    ($y1,$y2) = ($1,$2);
+  } else { die "Something went wrong with year processing of $ys\n" }
   $y1 = &normalize_year($y1);
   $y2 = &normalize_year($y2);
   if ($y1) {push @years,$y1; print "YEAR: $y1\n" if $opt_d;}
@@ -159,13 +176,17 @@ sub normalize_year {
   return "" if $y =~ /^ *$/;    # year was empty
   if ($y < 100) {
     # two digit year - check of 19.. or 20.. is meant
-    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
-    $two_d_year = substr $year,1;
-    $yn = $y + ($y <= $two_d_year+1 ? 2000 : 1900);
+    my $two_d_year = substr &current_year()+1900,2;
+    my $yn = $y + ($y <= $two_d_year+1 ? 2000 : 1900);
     print "Year $y interpreted as $yn\n" if $opt_d;
     $y = $yn;
   }
   return $y;
+}
+
+sub current_year {
+  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+  return $year;
 }
 
 sub fix_orcid {
@@ -254,25 +275,27 @@ Astrophysical Data System (ADS). The tool constructs a query URL and
 sends it to the default web browser. B<ads> takes author names and
 publishing years from the command line with as little fuss as
 possible. Additional search fields and options can be specified using
-command line switches, which also is a lot faster than the web form.
+command line switches.
 
-I<Alphabetic> arguments are parsed as author names. Quotes are only
-necessary to protect whitespace inside a name. Alternatively, replace
-spaces with underscore C<_> characters. A first name can be added like
-C<first.last> (separated by dot) or C<last,first> (separated by
-comma). Only the initial letter of the first name is significant, so
-C<last,f> and C<last,first> are equivalent.
-
-I<Numerical> arguments are interpreted as publishing years. Single or
-two-digit years are moved into the 20th and 21st century under the
-assumption that the specified year is intended to be at most 1 year
-into the future. A second year-like argument or something like
-'2012-2014' specifies a range. A year ending with `-` means starting
-from that year.
-
-=head1 OPTIONS
+=head1 ARGUMENTS and OPTIONS
 
 =over 5
+
+=item AUTHOR NAMES
+
+I<Alphabetic> arguments are parsed as author names. To protect
+whitespace in names, use quotes or replace space characters by
+underscore C<_> characters. A first name initial can be added like
+C<f.last> (separated by dot) or C<last,f> (separated by comma).  If
+necessary, an exact author match can be done using B<-i> ORCID.
+
+=item PUBLISHING YEARS
+
+I<Numerical> arguments are interpreted as publishing years. Single or
+two-digit years are moved into the 20th/21st century, such that the
+year is the current year (+1) or earlier. Two numerical arguments or
+an argument like '2012-2014' specify a range. '2004-' means since
+2004, '-2004' means until 2004.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
