@@ -177,8 +177,10 @@ sub normalize_year {
   return "" if $y =~ /^ *$/;    # year was empty
   if ($y < 100) {
     # two digit year - check of 19.. or 20.. is meant
-    my $two_d_year = substr &current_year()+1900,2;
-    my $yn = $y + ($y <= $two_d_year+1 ? 2000 : 1900);
+    my $cy = &current_year();
+    my $two_d_year = substr $cy,2;
+    my $century = 100 * substr( $cy,0,2);
+    my $yn = $y + $century - ($y <= $two_d_year+1 ? 0 : 100);
     print "Year $y interpreted as $yn\n" if $opt_d;
     $y = $yn;
   }
@@ -187,7 +189,7 @@ sub normalize_year {
 
 sub current_year {
   ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
-  return $year;
+  return $year+1900;
 }
 
 sub fix_orcid {
@@ -284,10 +286,10 @@ command line switches.
 
 =item AUTHOR NAMES
 
-I<Alphabetic> arguments are parsed as author last names. Use
-van_den_Heuvel or quote "van den Heuvel" if the name contains
-spaces. A first name initial can be added like C<f.last> (separated by
-dot) or C<last,f> (separated by comma).
+I<Alphabetic> arguments are parsed as author last names. A first name
+initial can be added like 'f.last' (separated by dot) or 'last,f'
+(separated by comma). Use underscores as in 'van_den_Heuvel' or quote
+'"van den Heuvel"' if the name contains spaces.
 
 =item PUBLISHING YEARS
 

@@ -25,10 +25,10 @@ command line switches.
 
 =item AUTHOR NAMES
 
-I<Alphabetic> arguments are parsed as author last names. Use
-van_den_Heuvel or quote "van den Heuvel" if the name contains
-spaces. A first name initial can be added like C<f.last> (separated by
-dot) or C<last,f> (separated by comma).
+I<Alphabetic> arguments are parsed as author last names. A first name
+initial can be added like 'f.last' (separated by dot) or 'last,f'
+(separated by comma). Use underscores as in 'van_den_Heuvel' or quote
+'"van den Heuvel"' if the name contains spaces.
 
 =item PUBLISHING YEARS
 
