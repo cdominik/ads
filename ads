@@ -284,10 +284,10 @@ command line switches.
 
 =item AUTHOR NAMES
 
-I<Alphabetic> arguments are parsed as author names. To protect
-whitespace in names, use quotes or replace space characters by
-underscore C<_> characters. A first name initial can be added like
-C<f.last> (separated by dot) or C<last,f> (separated by comma).
+I<Alphabetic> arguments are parsed as author last names. Use
+van_den_Heuvel or quote "van den Heuvel" if the name contains
+spaces. A first name initial can be added like C<f.last> (separated by
+dot) or C<last,f> (separated by comma).
 
 =item PUBLISHING YEARS
 
