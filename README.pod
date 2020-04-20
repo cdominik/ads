@@ -33,10 +33,9 @@ initial can be added like 'f.last' (separated by dot) or 'last,f'
 =item PUBLISHING YEARS
 
 I<Numerical> arguments are interpreted as publishing years. Single or
-two-digit years are moved into the current or previoous century, such
-that the year is the current year (+1) or earlier. Two numerical
-arguments or an argument like '2012-2014' specify a range. '2004-'
-means since 2004, '-2004' means until 2004.
+two-digit years are moved into the current or previous century. Two
+numerical arguments or an argument like '2012-2014' specify a
+range. '2004-' means since 2004, '-2004' means until 2004.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
