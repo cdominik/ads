@@ -47,8 +47,8 @@ sources that match all requested strings.
 
 =item B<-o> OBJECT
 
-An astronomical object to search for. Quote OBJECT to protect
-whitespace, or replace spaces with underscore characters.
+An astronomical object to search for. Quote "SR 21" or use
+SR_21 to protect whitespace in names.
 
 =item B<-i> ORCID
 
