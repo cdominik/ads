@@ -37,7 +37,7 @@ from that year.
 
 =over 5
 
-=item B<-t> STRING, B<-a> STRING, B<-f> STRING   
+=item B<-t>|B<-a>|B<-f> STRING   
 
 String phrase to be matched in the I<title>, I<abstract>, or
 I<fulltext>, respectively, of a bibliographic source.  Multiple
