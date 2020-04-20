@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$version = 2.8;
+$version = 3.0;
 
 # Usage information with:   ads -h
 # Full manpage with:        perldoc ads
@@ -44,7 +44,7 @@ while ($arg = shift @ARGV) {
     else              { $opt_d = 1;  print "Debugging on\n" }
     # Put the rest back onto ARGV
     unshift @ARGV,"-".$2 if $2;
-  } elsif ($arg =~ /^-([tafsoi])(.*)/) {
+  } elsif ($arg =~ /^-([tafso])(.*)/) {
     # A switch with a value
     $value = length($2)>0 ? $2 : shift @ARGV;
     if ($1 eq "s")    {$opt_s = $value;       print "SORTING:  $value\n" if $opt_d}
@@ -52,10 +52,15 @@ while ($arg = shift @ARGV) {
     elsif ($1 eq "a") {push @abstract,$value; print "ABSTRACT: $value\n" if $opt_d}
     elsif ($1 eq "f") {push @fulltext,$value; print "FULLTEXT: $value\n" if $opt_d}
     elsif ($1 eq "o") {push @object,  &fix_spaces($value); print "OBJECT:   $object[0]\n" if $opt_d}
-    elsif ($1 eq "i") {push @orcid,   &fix_orcid($value);  print "ORCID:    $orcid[0]\n"  if $opt_d}
-  } elsif ($arg =~ /^-?[0-9][-0-9]*$/) {
-    # This is a year specification
+  } elsif ($arg =~ /^(\d+|-\d+|\d+-|\d+-\d+)$/) {
+    # This is a year specification: 2000 or -2000 or 2000- or 2000-2005
     &handle_year($arg);
+  } elsif ($arg =~ /^\d{1,4}(-\d{4}){2,3}$/) {
+    # This looks like an ORCID without a -i switch.
+    push @orcid,&fix_orcid($arg);   print "ORCID:    $orcid[0]\n"  if $opt_d;
+  } elsif ($arg =~ /\w/ and $arg =~ /\d/) {
+    # This looks like an object name
+    push @object,&fix_spaces($arg); print "OBJECT:   $object[0]\n" if $opt_d;
   } elsif ($arg =~ /^-/) {
     die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n";
   } else {
@@ -137,9 +142,9 @@ sub handle_author {
   $a =~ s/\s+$//;
   $a =~ s/\.$//;
   if ($a eq $a1) {
-    printf "Adding author \"$a\"\n" if $opt_d;
+    printf "AUTHOR:   \"$a\"\n" if $opt_d;
   } else {
-    printf "Adding author \"$a1\" as \"$a\"\n" if $opt_d;
+    printf "AUTHOR:   \"$a1\" as \"$a\"\n" if $opt_d;
   }
   push @authors,$a;
 }
@@ -148,18 +153,19 @@ sub handle_year {
   # Interpret a year specification
   my $ys = shift;
   my $y1,$y2;
+  my $force;
   die "Bad year argument $ys\n" unless $ys =~ /^(-)?(\d+)(-(\d+)?)?/;
   if ($ys =~ /^(\d+)$/) {
     # Single year
     $y2 = $1;
   } elsif ($ys =~ /^-(\d+)$/) {
     # UNTIL range
-    $force_yr_range = "until";
+    $force = "until";
     $y2 = $1;
   } elsif ($ys =~ /^(\d+)-$/) {
     # SINCE range
     print "here\n";
-    $force_yr_range = "since";
+    $force = "since";
     $y1 = $1;
   } elsif ($ys =~ /^(\d+)-(\d+)$/) {
     # full range
@@ -167,8 +173,9 @@ sub handle_year {
   } else { die "Something went wrong with year processing of $ys\n" }
   $y1 = &normalize_year($y1);
   $y2 = &normalize_year($y2);
-  if ($y1) {push @years,$y1; print "YEAR: $y1\n" if $opt_d;}
-  if ($y2) {push @years,$y2; print "YEAR: $y2\n" if $opt_d;}
+  if ($y1) {push @years,$y1; print "YEAR: $force $y1\n" if $opt_d;}
+  if ($y2) {push @years,$y2; print "YEAR: $force $y2\n" if $opt_d;}
+  $force_yr_range = $force unless $force_yr_range;
 }
 
 sub normalize_year {
@@ -275,10 +282,10 @@ Make the F<ads> file executable and put it on your execution path.
 
 B<ads> is a commandline tool to pass a query to the website of the
 Astrophysical Data System (ADS). The tool constructs a query URL and
-sends it to the default web browser. B<ads> takes author names and
-publishing years from the command line with as little fuss as
-possible. Additional search fields and options can be specified using
-command line switches.
+sends it to the default web browser. B<ads> takes author names,
+publishing years, and astronomical object identifiers from the command
+line with as little fuss as possible. Additional search fields and
+options can be specified using command line switches.
 
 =head1 ARGUMENTS and OPTIONS
 
@@ -289,7 +296,9 @@ command line switches.
 I<Alphabetic> arguments are parsed as author last names. A first name
 initial can be added like 'f.last' (separated by dot) or 'last,f'
 (separated by comma). Use underscores as in 'van_den_Heuvel' or quote
-'"van den Heuvel"' if the name contains spaces.
+'"van den Heuvel"' if the name contains spaces.  If an argument looks
+like (the significant tail of) an ORCID, find articles claimed by that
+ORCID.
 
 =item PUBLISHING YEARS
 
@@ -298,6 +307,15 @@ two-digit years are moved into the current or previous century. Two
 numerical arguments or an argument like '2012-2014' specify a
 range. '2004-' means since 2004, '-2004' means until 2004.
 
+=item B<-o> OBJECT
+
+Read the next argument as the name or identifier of an astronomical
+object. Underscore may be used instead of space to eliminate the need
+for quotes.  If the name contains both letters and digits, recognition
+as an object identifier will be automatic and the B<-o> may be left
+out. But it is needed for more classical names that have no digits
+like `B<-o> Aldebaran' or 'B<-o> CS_Cha'.
+
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
 String phrase to be matched in the I<title>, I<abstract>, or
@@ -305,20 +323,10 @@ I<fulltext>, respectively, of a bibliographic source.  Multiple
 B<-t>/B<-a>/B<-f> switches with strings can be given to retrieve only
 sources that match all requested strings.
 
-=item B<-o> OBJECT
-
-An astronomical object to search for. Quote "SR 21" or use
-SR_21 to protect whitespace in names.
-
-=item B<-i> ORCID
-
-Search for an author by ORCID identifier. Leading zeros in the ORCID
-can be left out.
-
 =item B<-c>
 
-Sort matched bibliographic sources by citation count.  The default is
-to sort by date. B<-c> is a shorthand for B<-sc>, see below.
+Sort the output by citation count.  The default is to sort by
+date. B<-c> is a shorthand for B<-sc>.
 
 =item B<-r>
 
@@ -360,8 +368,7 @@ author, and in the range from 1999 to 2004.
     ads -r ^Dullemond Dominik 1999-2004
     ads -r ^Dullemond Dominik 99-4
 
-Get papers of Ed van den Heuvel, a name with spaces that need to be
-protected.
+Get papers of Ed van den Heuvel.
 
     ads "van den heuvel,E"
     ads van_den_heuvel,E
@@ -374,6 +381,10 @@ B<ads> allows to freely mix switch arguments with author and year
 arguments.
 
     ads natta,a -sn 1990 2000 -t protostar
+
+Papers by Muro-Arena, Ginski, and Benisty on the object SR 21.
+
+    ads ginski muro-arena sr_21
 
 Find articles with the phrase "planet formation" in the abstract.
 
