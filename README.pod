@@ -28,8 +28,7 @@ command line switches.
 I<Alphabetic> arguments are parsed as author names. To protect
 whitespace in names, use quotes or replace space characters by
 underscore C<_> characters. A first name initial can be added like
-C<f.last> (separated by dot) or C<last,f> (separated by comma).  If
-necessary, an exact author match can be done using B<-i> ORCID.
+C<f.last> (separated by dot) or C<last,f> (separated by comma).
 
 =item PUBLISHING YEARS
 

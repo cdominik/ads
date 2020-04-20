@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$version = 2.6;
+$version = 2.7;
 
 # Usage information with:   ads -h
 # Full manpage with:        perldoc ads
@@ -8,7 +8,7 @@ use List::Util qw[min max];
 
 if (not @ARGV or $ARGV[0] =~ /^--?h(elp)?$/) { &usage(); exit(0); }
 
-# Some Defaults and option hashes
+# Some defaults and option hashes
 
 # Collections to be searched.  This can be P for "physics", A for "astronomy",
 # or G for general.  Leave empty to search all by default.
@@ -64,10 +64,11 @@ while ($arg = shift @ARGV) {
   }
 }
 
+# Build the different pecesof the query
+
 if (@years) {
   $y1 = min @years;
   $y2 = max @years;
-  print "tears $y1 $y2>>$force_yr_range<<\n";
   $years = " year:";
   if    ($y2 > $y1)                  {$years .= "$y1-$y2"}
   elsif ($force_yr_range eq "since") {$years .= "$y1-"}
@@ -286,8 +287,7 @@ command line switches.
 I<Alphabetic> arguments are parsed as author names. To protect
 whitespace in names, use quotes or replace space characters by
 underscore C<_> characters. A first name initial can be added like
-C<f.last> (separated by dot) or C<last,f> (separated by comma).  If
-necessary, an exact author match can be done using B<-i> ORCID.
+C<f.last> (separated by dot) or C<last,f> (separated by comma).
 
 =item PUBLISHING YEARS
 
