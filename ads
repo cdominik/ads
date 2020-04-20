@@ -110,9 +110,9 @@ $url = &encode_string($url);
 # Put everything together
 $url = "https://ui.adsabs.harvard.edu/search/"
   . ($opt_r ? $refstring : "") . $url;
+
 # Send the URL to the browser
 print "Calling URL: $url\n" if $opt_d;
-exit(0);
 if    ($^O =~ /darwin/i) { exec "open '$url'";         }
 elsif ($^O =~ /linux/i)  { exec "xdg-open '$url'";     }
 elsif ($^O =~ /mswin/i)  { exec "cmd /c start '$url'"; }
