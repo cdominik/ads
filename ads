@@ -83,7 +83,7 @@ $object   .= sprintf(' object:"%s"' ,shift(@object))   while @object;
 $orcid    .= sprintf(' orcid:"%s"'  ,shift(@orcid))    while @orcid;
 
 if ($opt_s) {
-  unless ($shash{$opt_s}) {    
+  unless ($shash{$opt_s}) {
     print STDERR "Invalid sorting option '$opt_s', falling back to date sorting\n";
     $opt_s = "date";
   }
@@ -274,7 +274,7 @@ from that year.
 
 =over 5
 
-=item B<-t>|B<-a>|B<-f> STRING   
+=item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
 String phrase to be matched in the I<title>, I<abstract>, or
 I<fulltext>, respectively, of a bibliographic source.  Multiple
