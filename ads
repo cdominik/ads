@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$version = 3.0;
+$version = 3.1;
 
 # Usage information with:   ads -h
 # Full manpage with:        perldoc ads
@@ -61,8 +61,8 @@ while ($arg = shift @ARGV) {
   } elsif ($arg =~ /^\d{1,4}(-\d{4}){2,3}$/) {
     # This looks like an ORCID without a -i switch.
     push @orcid,&fix_orcid($arg);   &dbg("ORCID:    $orcid[0]\n");
-  } elsif ($arg =~ /\w/ and $arg =~ /\d/) {
-    # This looks like an object name
+  } elsif (($arg =~ /\w/ and $arg =~ /\d/) or $arg =~ s/-o$//) {
+    # This looks like an object name, or the -o at the end forces the issue
     push @object,&fix_spaces($arg); &dbg("OBJECT:   $object[0]\n");
   } elsif ($arg =~ /^-/) {
     die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n";
@@ -72,8 +72,7 @@ while ($arg = shift @ARGV) {
   }
 }
 
-# Build the different pecesof the query
-
+# Build the different parts of the query
 if (@years) {
   $y1 = min @years;
   $y2 = max @years;
@@ -120,7 +119,8 @@ $url = &encode_string($url);
 $url = "https://ui.adsabs.harvard.edu/search/"
   . ($opt_r ? $refstring : "") . $url;
 
-# Send the URL to the browser
+# Send the URL to the browser.
+# How to do this depends on the underlying system
 &dbg("Calling URL: $url\n");
 unless ($noexecute) {
   if    ($^O =~ /darwin/i) { exec "open '$url'";         }
@@ -136,10 +136,8 @@ unless ($noexecute) {
 
 # Subroutines
 
-sub dbg {
-  # Print a line if debugging is on
-  print shift if $opt_d;
-}
+# Print a line if debugging is on
+sub dbg { print shift if $opt_d; }
 
 sub handle_author {
   # Put initials in the back, and convert underscore to space
