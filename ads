@@ -32,35 +32,38 @@ $sort     = "date";  $sort_dir = "desc";
 # Process command line options. We do it by hand, to allow
 # an arbitraty mix between switches and other args
 while ($arg = shift @ARGV) {
-  print "Processing argment $arg\n" if $opt_d;
-  if ($arg =~ /^-([rdcAPG])(.*)/) {
+  &dbg("Processing argment $arg\n");
+  if ($arg =~ /^-([dDrcAPG])(.*)/) {
     # a switch without argument
-    if ($1 eq "r")    { $opt_r = 1;  print "REFEREED only\n"      if $opt_d }
-    elsif ($1 eq "c") { $opt_s = $1; print "Interpreted as -sc\n" if $opt_d }
+    if ($1 eq "r")    { $opt_r = 1;  &dbg("REFEREED only\n")      }
+    elsif ($1 eq "c") { $opt_s = $1; &dbg("Interpreted as -sc\n") }
     elsif ($1 eq "A" or $1 eq "P" or $1 eq "G") {
       $database = $1;
-      print "Selecting $dhash{$1} database\n" if $opt_d;
+      &dbg("Selecting $dhash{$1} database\n");
+    } else {
+      $opt_d = 1; &dbg("Debugging on\n");
+      $noexecute = 1 if $1 eq "D";
     }
-    else              { $opt_d = 1;  print "Debugging on\n" }
-    # Put the rest back onto ARGV
+    # Put clustered arguments rest back onto ARGV
     unshift @ARGV,"-".$2 if $2;
   } elsif ($arg =~ /^-([tafso])(.*)/) {
     # A switch with a value
     $value = length($2)>0 ? $2 : shift @ARGV;
-    if ($1 eq "s")    {$opt_s = $value;       print "SORTING:  $value\n" if $opt_d}
-    elsif ($1 eq "t") {push @title,   $value; print "TITLE:    $value\n" if $opt_d}
-    elsif ($1 eq "a") {push @abstract,$value; print "ABSTRACT: $value\n" if $opt_d}
-    elsif ($1 eq "f") {push @fulltext,$value; print "FULLTEXT: $value\n" if $opt_d}
-    elsif ($1 eq "o") {push @object,  &fix_spaces($value); print "OBJECT:   $object[0]\n" if $opt_d}
+    if ($1 eq "s")    {$opt_s = $value;       &dbg("SORTING:  $value\n")}
+    elsif ($1 eq "t") {push @title,   $value; &dbg("TITLE:    $value\n")}
+    elsif ($1 eq "a") {push @abstract,$value; &dbg("ABSTRACT: $value\n")}
+    elsif ($1 eq "f") {push @fulltext,$value; &dbg("FULLTEXT: $value\n")}
+    elsif ($1 eq "o") {push @object,  &fix_spaces($value);
+                       &dbg("OBJECT:   $object[0]\n")}
   } elsif ($arg =~ /^(\d+|-\d+|\d+-|\d+-\d+)$/) {
     # This is a year specification: 2000 or -2000 or 2000- or 2000-2005
     &handle_year($arg);
   } elsif ($arg =~ /^\d{1,4}(-\d{4}){2,3}$/) {
     # This looks like an ORCID without a -i switch.
-    push @orcid,&fix_orcid($arg);   print "ORCID:    $orcid[0]\n"  if $opt_d;
+    push @orcid,&fix_orcid($arg);   &dbg("ORCID:    $orcid[0]\n");
   } elsif ($arg =~ /\w/ and $arg =~ /\d/) {
     # This looks like an object name
-    push @object,&fix_spaces($arg); print "OBJECT:   $object[0]\n" if $opt_d;
+    push @object,&fix_spaces($arg); &dbg("OBJECT:   $object[0]\n");
   } elsif ($arg =~ /^-/) {
     die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n";
   } else {
@@ -118,19 +121,25 @@ $url = "https://ui.adsabs.harvard.edu/search/"
   . ($opt_r ? $refstring : "") . $url;
 
 # Send the URL to the browser
-print "Calling URL: $url\n" if $opt_d;
-if    ($^O =~ /darwin/i) { exec "open '$url'";         }
-elsif ($^O =~ /linux/i)  { exec "xdg-open '$url'";     }
-elsif ($^O =~ /mswin/i)  { exec "cmd /c start '$url'"; }
-elsif ($^O =~ /cygwin/i) { exec "cygstart '$url'";     }
-else                     { exec "open '$url'";         } # Fallback option
-
+&dbg("Calling URL: $url\n");
+unless ($noexecute) {
+  if    ($^O =~ /darwin/i) { exec "open '$url'";         }
+  elsif ($^O =~ /linux/i)  { exec "xdg-open '$url'";     }
+  elsif ($^O =~ /mswin/i)  { exec "cmd /c start '$url'"; }
+  elsif ($^O =~ /cygwin/i) { exec "cygstart '$url'";     }
+  else                     { exec "open '$url'";         } # Fallback option
+}
 # And .... we are done
 
 # ==========================================================================
 # ==========================================================================
 
 # Subroutines
+
+sub dbg {
+  # Print a line if debugging is on
+  print shift if $opt_d;
+}
 
 sub handle_author {
   # Put initials in the back, and convert underscore to space
@@ -142,9 +151,9 @@ sub handle_author {
   $a =~ s/\s+$//;
   $a =~ s/\.$//;
   if ($a eq $a1) {
-    printf "AUTHOR:   \"$a\"\n" if $opt_d;
+    &dbg("AUTHOR:   \"$a\"\n");
   } else {
-    printf "AUTHOR:   \"$a1\" as \"$a\"\n" if $opt_d;
+    &dbg("AUTHOR:   \"$a1\" as \"$a\"\n");
   }
   push @authors,$a;
 }
@@ -173,8 +182,8 @@ sub handle_year {
   } else { die "Something went wrong with year processing of $ys\n" }
   $y1 = &normalize_year($y1);
   $y2 = &normalize_year($y2);
-  if ($y1) {push @years,$y1; print "YEAR: $force $y1\n" if $opt_d;}
-  if ($y2) {push @years,$y2; print "YEAR: $force $y2\n" if $opt_d;}
+  if ($y1) {push @years,$y1; &dbg("YEAR: $force $y1\n")}
+  if ($y2) {push @years,$y2; &dbg("YEAR: $force $y2\n")}
   $force_yr_range = $force unless $force_yr_range;
 }
 
@@ -188,7 +197,7 @@ sub normalize_year {
     my $two_d_year = substr $cy,2;
     my $century = 100 * substr( $cy,0,2);
     my $yn = $y + $century - ($y <= $two_d_year+1 ? 0 : 100);
-    print "Year $y interpreted as $yn\n" if $opt_d;
+    &dbg("Year $y interpreted as $yn\n");
     $y = $yn;
   }
   return $y;
@@ -226,7 +235,7 @@ sub get_sorting {
   my $s1;
   $s1 = $s;
   $s = $shash{$s} while length($s) < 4;
-  print "Sorting option '$s1' translated to '$s'\n" if $opt_d and $s1 ne $s;
+  &dbg("Sorting option '$s1' translated to '$s'\n") if $s1 ne $s;
   return $s;
 }
 
@@ -249,15 +258,12 @@ sub usage {
   print <<'END';
 USAGE:    ads [options] [author]... [year[-endyear]] [options]
 OPTIONS:
-   -t STRING   Title phrase
-   -a STRING   Abstract phrase
-   -f STRING   Fulltext phrase
-   -o OBJECT   Object name
-   -i ORCID    ORCID search
-   -c          Sort by citation count instead of date (same as -sc)
-   -r          Refereed only
-   -A -P -G    Narrow to astronomy, physics or general database
-   -s a|c|n|s  Sorting: author cite normcite score (default:date)
+   -t -a -f STRING  Title/Abstract/Fulltext phrase
+   -o OBJECT        Object name
+   -c               Sort by citation count instead of date (short for -sc)
+   -r               Refereed only
+   -A -P -G         Narrow to astronomy, physics or general database
+   -s a|c|n|s       Sorting: author cite normcite score (default:date)
 EXAMPLE: ads dominik,c -t rolling -sn -r 1995-2014
 * Options and arguments can be arbitrarily mixed, see EXAMPLE.
 * Switch repetition:               ads -t galaxy -t evolution
