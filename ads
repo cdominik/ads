@@ -254,14 +254,14 @@ sub encode_string {
 sub usage {
   # Print usage information
   print <<'END';
-USAGE:    ads [options] [author]... [year[-endyear]] [options]
+USAGE:    ads [options] [author,i]... [year[-endyear]] [options]
 OPTIONS:
-   -t -a -f STRING  Title/Abstract/Fulltext phrase
-   -o OBJECT        Object name
-   -c               Sort by citation count instead of date (short for -sc)
-   -r               Refereed only
-   -A -P -G         Narrow to astronomy, physics or general database
-   -s a|c|n|s       Sorting: author cite normcite score (default:date)
+   -t|a|f STRING  Title/Abstract/Fulltext phrase
+   -o OBJECT      Object name or identifier
+   -c             Sort by citation count instead of date (short for -sc)
+   -r             Refereed only
+   -A|P|G         Narrow to astronomy, physics or general database
+   -s a|c|n|s     Sorting: author cite normcite score (default:date)
 EXAMPLE: ads dominik,c -t rolling -sn -r 1995-2014
 * Options and arguments can be arbitrarily mixed, see EXAMPLE.
 * Switch repetition:               ads -t galaxy -t evolution
@@ -324,13 +324,13 @@ like `B<-o> Aldebaran' or 'B<-o> CS_Cha'.
 
 String phrase to be matched in the I<title>, I<abstract>, or
 I<fulltext>, respectively, of a bibliographic source.  Multiple
-B<-t>/B<-a>/B<-f> switches with strings can be given to retrieve only
+B<-t>/B<-a>/B<-f> switches with strings can be given to retrieve
 sources that match all requested strings.
 
 =item B<-c>
 
-Sort the output by citation count.  The default is to sort by
-date. B<-c> is a shorthand for B<-sc>.
+Sort matches by citation count.  The default is to sort by date. B<-c>
+is a shorthand for B<-sc>.
 
 =item B<-r>
 
