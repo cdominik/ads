@@ -34,8 +34,8 @@ $sort     = "date";  $sort_dir = "desc";
 while ($arg = shift @ARGV) {
   &dbg("Processing argment $arg\n");
   if ($arg =~ /^-([dDrcAPG])(.*)/) {
-    # a switch without argument
-    if ($1 eq "r")    { $opt_r = 1;  &dbg("REFEREED only\n")      }
+    # a switch without a value
+    if    ($1 eq "r") { $opt_r = 1;  &dbg("REFEREED only\n")      }
     elsif ($1 eq "c") { $opt_s = $1; &dbg("Interpreted as -sc\n") }
     elsif ($1 eq "A" or $1 eq "P" or $1 eq "G") {
       $database = $1;
@@ -44,12 +44,12 @@ while ($arg = shift @ARGV) {
       $opt_d = 1; &dbg("Debugging on\n");
       $noexecute = 1 if $1 eq "D";
     }
-    # Put clustered arguments rest back onto ARGV
+    # Put clustered switches and arguments back onto ARGV
     unshift @ARGV,"-".$2 if $2;
   } elsif ($arg =~ /^-([tafso])(.*)/) {
     # A switch with a value
     $value = length($2)>0 ? $2 : shift @ARGV;
-    if ($1 eq "s")    {$opt_s = $value;       &dbg("SORTING:  $value\n")}
+    if    ($1 eq "s") {$opt_s = $value;       &dbg("SORTING:  $value\n")}
     elsif ($1 eq "t") {push @title,   $value; &dbg("TITLE:    $value\n")}
     elsif ($1 eq "a") {push @abstract,$value; &dbg("ABSTRACT: $value\n")}
     elsif ($1 eq "f") {push @fulltext,$value; &dbg("FULLTEXT: $value\n")}
@@ -59,7 +59,7 @@ while ($arg = shift @ARGV) {
     # This is a year specification: 2000 or -2000 or 2000- or 2000-2005
     &handle_year($arg);
   } elsif ($arg =~ /^\d{1,4}(-\d{4}){2,3}$/) {
-    # This looks like an ORCID without a -i switch.
+    # This looks like an ORCID
     push @orcid,&fix_orcid($arg);   &dbg("ORCID:    $orcid[0]\n");
   } elsif (($arg =~ /\w/ and $arg =~ /\d/) or $arg =~ s/-o$//) {
     # This looks like an object name, or the -o at the end forces the issue
@@ -73,6 +73,13 @@ while ($arg = shift @ARGV) {
 }
 
 # Build the different parts of the query
+
+# Authors
+while ($a=shift(@authors)) { $authors .= " author:\"$a\""; }
+$authors =~ s/ //;
+$orcid    .= sprintf(' orcid:"%s"'  ,shift(@orcid))    while @orcid;
+
+# Publishing years
 if (@years) {
   $y1 = min @years;
   $y2 = max @years;
@@ -83,15 +90,13 @@ if (@years) {
   else {$years .= $y1}
 }
 
-while ($a=shift(@authors)) { $authors .= " author:\"$a\""; }
-$authors =~ s/ //;
-
+# Text and object searches
 $title    .= sprintf(' title:"%s"'  ,shift(@title))    while @title;
 $abstract .= sprintf(' abs:"%s"'    ,shift(@abstract)) while @abstract;
 $fulltext .= sprintf(' full:"%s"'   ,shift(@fulltext)) while @fulltext;
 $object   .= sprintf(' object:"%s"' ,shift(@object))   while @object;
-$orcid    .= sprintf(' orcid:"%s"'  ,shift(@orcid))    while @orcid;
 
+# Sorting
 if ($opt_s) {
   unless ($shash{$opt_s}) {
     print STDERR "Invalid sorting option '$opt_s', falling back to date sorting\n";
@@ -100,22 +105,20 @@ if ($opt_s) {
   # get the official sorting key out of the hash, if necessary by a chain
   $sort = &get_sorting($opt_s);
 }
-
-$database = "&fq=database:$dhash{$database}" if $database;
-
 if ($sort eq "first_author") {$sort_dir = "asc";} # change sort direction
 $sorting  = "&sort=$sort $sort_dir, bibcode desc";
 
+# Collection
+$database = "&fq=database:$dhash{$database}" if $database;
+
+# Refereed only or also unrefereed?
 $refstring =  "filter_property_fq_property=AND&filter_property_fq_property=property%3A%22refereed%22&fq=%7B!type=aqp%20v%3D%24fq_property%7D&fq_property=(property%3A%22refereed%22)&";
 
+# Build and encode the URL
 $url = "q=" . " $authors$years"
   . $title . $abstract . $fulltext . $object . $orcid . $database
   . "$sorting" . "&p_=0";
-
-# Encode special characters
 $url = &encode_string($url);
-
-# Put everything together
 $url = "https://ui.adsabs.harvard.edu/search/"
   . ($opt_r ? $refstring : "") . $url;
 
@@ -141,6 +144,7 @@ sub dbg { print shift if $opt_d; }
 
 sub handle_author {
   # Put initials in the back, and convert underscore to space
+  # Then, add the author to the list
   my $a = shift;
   my $a1 = $a;
   $a = "$3,$1" if $a =~ /((\w+\.)+)(.+)/;
@@ -202,7 +206,7 @@ sub normalize_year {
 }
 
 sub current_year {
-  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
   return $year+1900;
 }
 
@@ -263,6 +267,7 @@ OPTIONS:
    -A|P|G         Narrow to astronomy, physics or general database
    -s a|c|n|s     Sorting: author cite normcite score (default:date)
 EXAMPLE: ads dominik,c -t rolling -sn -r 1995-2014
+* AUTHOR can also be an orcid
 * Options and arguments can be arbitrarily mixed, see EXAMPLE.
 * Switch repetition:               ads -t galaxy -t evolution
 * Switch and argument clustering:  ads -roVega -sn
@@ -317,8 +322,9 @@ Read the next argument as the name or identifier of an astronomical
 object. Underscore may be used instead of space to eliminate the need
 for quotes.  If the name contains both letters and digits, recognition
 as an object identifier will be automatic and the B<-o> may be left
-out. But it is needed for more classical names that have no digits
-like `B<-o> Aldebaran' or 'B<-o> CS_Cha'.
+out. B<-o> is needed for more classical names that have no digits
+like `B<-o> Aldebaran' or 'B<-o> CS_Cha'.  If you remember too late to
+type B<-o>, you can also write 'CS_Cha-o'.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 

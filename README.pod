@@ -45,8 +45,9 @@ Read the next argument as the name or identifier of an astronomical
 object. Underscore may be used instead of space to eliminate the need
 for quotes.  If the name contains both letters and digits, recognition
 as an object identifier will be automatic and the B<-o> may be left
-out. But it is needed for more classical names that have no digits
-like `B<-o> Aldebaran' or 'B<-o> CS_Cha'.
+out. B<-o> is needed for more classical names that have no digits
+like `B<-o> Aldebaran' or 'B<-o> CS_Cha'.  If you remember too late to
+type B<-o>, you can also write 'CS_Cha-o'.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
