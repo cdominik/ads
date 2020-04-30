@@ -43,9 +43,9 @@ range. '2004-' means since 2004, '-2004' means until 2004.
 
 Read the next argument as the name or identifier of an astronomical
 object. Underscore may be used instead of space to eliminate the need
-for quotes.  B<ads> is pretty good at recognizing object
-identifiers[1] even if you leave out the B<-o>, but if you want to be
-sure write 'B<-o> CS_Cha'.
+for quotes.  B<ads> is pretty good at recognizing object identifiers
+even if you leave out the B<-o>, but that does not work or if you want
+to be sure write, for example, 'B<-o> Sirius'.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
@@ -129,21 +129,6 @@ abstract.
 Get articles about HD 142527 since 2017.
 
     ads hd_142527 17-
-
-=head1 FOOTNOTES
-
-[1] The automatic recognition of object names works like this:
-    - Anything that contains both letters and numbers. This covers M31,
-      PSR_B1937+21, 51_peg and V776_Cyg.
-    - Two letters or a greek letter name, followed by at least 3
-      letters (assumed to be a constellation name), followed optionally
-      by one or two letters indicating a binary component or planet.
-      This covers CV_Cha, "beta pic b", pi_lupi etc.
-    - A few hardcoded stellar names that have no conflicts with author
-      names are recognized, e.g. Proxima, Fomalhaut and a few others,
-      nowhere nearly complete.
-    - When in doubt, use B[-o], as a normal switch or as postfix:
-      'ads -o rigel' or 'ads rigel-o' both will do the trick.
 
 =head1 AUTHOR
 
