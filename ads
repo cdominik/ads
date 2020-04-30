@@ -29,7 +29,7 @@ $sort     = "date";  $sort_dir = "desc";
            ac=> "author_count",        na  => "ac"
   );
 
-$clever_object_detection = 0;  # When 0, only recognize alpha+numeric
+$clever_object_detection = 1;  # When 0, only recognize alpha+numeric
 $objectre = &make_object_regexp();
 
 # Process command line options. We do it by hand, to allow
@@ -199,7 +199,7 @@ sub normalize_year {
   return "" if $y =~ /^ *$/;    # year was empty
   if ($y < 100) {
     # two digit year - check of 19.. or 20.. is meant
-    my $cy = &current_year();
+    my $cy = 1900 + (localtime())[5];
     my $two_d_year = substr $cy,2;
     my $century = 100 * substr( $cy,0,2);
     my $yn = $y + $century - ($y <= $two_d_year+1 ? 0 : 100);
@@ -207,11 +207,6 @@ sub normalize_year {
     $y = $yn;
   }
   return $y;
-}
-
-sub current_year {
-  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
-  return $year+1900;
 }
 
 sub fix_orcid {
@@ -228,8 +223,7 @@ sub fix_orcid {
 sub fix_spaces {
   # Replace underscore with space
   my $s = shift @_;
-  $s =~ s/_/ /g;
-  return $s;
+  return $s=~ s/_/ /g;
 }
 
 sub get_sorting {
@@ -238,8 +232,7 @@ sub get_sorting {
   # each abbreviation to the canonical abbreviation, and then from the
   # canonical abbreviation to the full sorting keyword.
   my $s = shift @_;
-  my $s1;
-  $s1 = $s;
+  my $s1 = $s;
   $s = $shash{$s} while length($s) < 4;
   &dbg("Sorting option '$s1' translated to '$s'\n") if $s1 ne $s;
   return $s;
@@ -286,7 +279,7 @@ sub make_object_regexp {
   my $alphanumeric  = "(?:.*?[a-z].*?[0-9].*|.*?[0-9].*?[a-z].*)";
   my $binpl         = "(?:[a-z]{1,2})"; # binary or planet
   my $variable      = "(?:[a-z]{1,2})"; # one or two letters
-  return "(?i)$alphanumeric" if not $clever_object_detection;
+  return "(?i)$alphanumeric" unless $clever_object_detection;
   return 
     # Case-insensitive matching
     "(?i)" .
