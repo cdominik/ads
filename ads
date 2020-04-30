@@ -370,8 +370,8 @@ range. '2004-' means since 2004, '-2004' means until 2004.
 Read the next argument as the name or identifier of an astronomical
 object. Underscore may be used instead of space to eliminate the need
 for quotes.  B<ads> is pretty good at recognizing object identifiers
-even if you leave out the B<-o>, but that does not work or if you want
-to be sure write, for example, 'B<-o> Sirius'.
+even if you leave out the B<-o>, but if that does not work or if you
+want to be sure write, for example, 'B<-o> Sirius'.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
