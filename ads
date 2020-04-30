@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$version = 3.1;
+$version = 3.2;
 
 # Usage information with:   ads -h
 # Full manpage with:        perldoc ads
@@ -29,10 +29,14 @@ $sort     = "date";  $sort_dir = "desc";
            ac=> "author_count",        na  => "ac"
   );
 
+$clever_object_detection = 0;  # When 0, only recognize alpha+numeric
+$objectre = &make_object_regexp();
+
 # Process command line options. We do it by hand, to allow
 # an arbitraty mix between switches and other args
 while ($arg = shift @ARGV) {
   &dbg("Processing argment $arg\n");
+  $argws = &fix_spaces($arg);
   if ($arg =~ /^-([dDrcAPG])(.*)/) {
     # a switch without a value
     if    ($1 eq "r") { $opt_r = 1;  &dbg("REFEREED only\n")      }
@@ -61,7 +65,7 @@ while ($arg = shift @ARGV) {
   } elsif ($arg =~ /^\d{1,4}(-\d{4}){2,3}$/) {
     # This looks like an ORCID
     push @orcid,&fix_orcid($arg);   &dbg("ORCID:    $orcid[0]\n");
-  } elsif (($arg =~ /\w/ and $arg =~ /\d/) or $arg =~ s/-o$//) {
+  } elsif (($argws =~ /$objectre/) or $arg =~ s/-o$//) {
     # This looks like an object name, or the -o at the end forces the issue
     push @object,&fix_spaces($arg); &dbg("OBJECT:   $object[0]\n");
   } elsif ($arg =~ /^-/) {
@@ -255,6 +259,51 @@ sub encode_string {
   return $s;
 }
 
+sub make_object_regexp {
+  # Return a regular expression that matches and object in order to
+  # distinguish it from a human name.  So this can be pretty
+  # imperfect, as long as it does not easily match human names.
+  
+  @greek_letters = (
+    # written version of the greek letters
+    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta",
+    "theta", "iota", "kappa", "lambda", "mu", "nu", "xi", "omi[ck]ron",
+    "pi", "rho", "sigma", "tau", "upsilon", "phi", "chi", "psi",
+    "omega" );
+
+  @propernames = (
+    # Proper names of stars that should be recognized I have only a
+    # few names here that I recognize, and that do not conflict with
+    # actual author names.  The user can add here if she wants.
+    "Acrab", "Albireo", "Alcor", "Alcyone", "Aldebaran", "Alderamin",
+    "Algol", "Alkarab", "Altair", "Antares", "Arcturus", "Atlas",
+    "Bellatrix", "Betelgeuse", "Canopus", "Deneb", "Fomalhaut",
+    "Pleione", "Polaris", "Procyon", "Proxima" );
+
+  my $constellation = "(?:[a-z]{3,})"; # at lease three letters
+  my $greekletter   = "(?:" . join("|",@greek_letters) . ")";
+  my $propername    = "(?:" . join("|",@propernames) . ")";
+  my $alphanumeric  = "(?:.*?[a-z].*?[0-9].*|.*?[0-9].*?[a-z].*)";
+  my $binpl         = "(?:[a-z]{1,2})"; # binary or planet
+  my $variable      = "(?:[a-z]{1,2})"; # one or two letters
+  return "(?i)$alphanumeric" if not $clever_object_detection;
+  return 
+    # Case-insensitive matching
+    "(?i)" .
+    # Open the overall group, places between ^ and $
+    "^(?:" .
+    # Anything with *both* numbers and letters.  This is distinct from
+    # names and covers the vast majority of astronomical designators like
+    # 51 Peg, HD142527, M31, PSR B1937+21, etc etc
+    "$alphanumeric" . "|" .
+    # A star with a proper name, plus maybe a binary/planet letter
+    "$propername(?: +$binpl)?" . "|" .
+    # A star in a constellation, plus maybe binary/planet letter.
+    # We do not need numbered stars like 51 Peg, they are alpha+numeric
+    "(?:$greekletter|$variable) +$constellation(?: +$binpl)?" .
+    ")\$";
+}
+
 sub usage {
   # Print usage information
   print <<'END';
@@ -316,15 +365,13 @@ two-digit years are moved into the current or previous century. Two
 numerical arguments or an argument like '2012-2014' specify a
 range. '2004-' means since 2004, '-2004' means until 2004.
 
-=item B<-o> OBJECT
+=item [B<-o>] OBJECT
 
 Read the next argument as the name or identifier of an astronomical
 object. Underscore may be used instead of space to eliminate the need
-for quotes.  If the name contains both letters and digits, recognition
-as an object identifier will be automatic and the B<-o> may be left
-out. B<-o> is needed for more classical names that have no digits
-like `B<-o> Aldebaran' or 'B<-o> CS_Cha'.  If you remember too late to
-type B<-o>, you can also write 'CS_Cha-o'.
+for quotes.  B<ads> is pretty good at recognizing object
+identifiers[1] even if you leave out the B<-o>, but if you want to be
+sure write 'B<-o> CS_Cha'.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
@@ -404,6 +451,25 @@ Find articles with both "planet" and "system" anywhere in the
 abstract.
 
     ads -aplanet -a system
+
+Get articles about HD 142527 since 2017.
+
+    ads hd_142527 17-
+
+=head1 FOOTNOTES
+
+[1] The automatic recognition of object names works like this:
+    - Anything that contains both letters and numbers. This covers M31,
+      PSR_B1937+21, 51_peg and V776_Cyg.
+    - Two letters or a greek letter name, followed by at least 3
+      letters (assumed to be a constellation name), followed optionally
+      by one or two letters indicating a binary component or planet.
+      This covers CV_Cha, "beta pic b", pi_lupi etc.
+    - A few hardcoded stellar names that have no conflicts with author
+      names are recognized, e.g. Proxima, Fomalhaut and a few others,
+      nowhere nearly complete.
+    - When in doubt, use B[-o], as a normal switch or as postfix:
+      'ads -o rigel' or 'ads rigel-o' both will do the trick.
 
 =head1 AUTHOR
 
