@@ -328,7 +328,7 @@ END
 
 =head1 NAME
 
-B<ads> - commandline access to ADS (Astrophysical Data System)
+B<ads> - commandline access to L<ADS|https:://adsabs.harvard.edu/ads_abstracts.html (Astrophysical Data System)
 
 =head1 SYNOPSIS
 
@@ -339,11 +339,12 @@ Make the F<ads> file executable and put it on your execution path.
 =head1 DESCRIPTION
 
 B<ads> is a commandline tool to pass a query to the website of the
-Astrophysical Data System (ADS). The tool constructs a query URL and
-sends it to the default web browser. B<ads> takes author names,
-publishing years, and astronomical object identifiers from the command
-line with as little fuss as possible. Additional search fields and
-options can be specified using command line switches.
+Astrophysical Data System (L<ADS|https:://adsabs.harvard.edu/>). The
+tool constructs a query URL and sends it to the default web
+browser. B<ads> takes author names, publishing years, and astronomical
+object identifiers from the command line with as little fuss as
+possible. Additional search fields and options can be specified using
+command line switches.
 
 =head1 ARGUMENTS and OPTIONS
 
@@ -355,8 +356,8 @@ I<Alphabetic> arguments are parsed as author last names. A first name
 initial can be added like 'f.last' (separated by dot) or 'last,f'
 (separated by comma). Use underscores as in 'van_den_Heuvel' or quote
 '"van den Heuvel"' if the name contains spaces.  If an argument looks
-like (the significant tail of) an ORCID, find articles claimed by that
-ORCID.
+like (the significant tail of) an L<ORCID|https://orchid.org>, find
+articles claimed by that ORCID.
 
 =item PUBLISHING YEARS
 
