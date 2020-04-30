@@ -38,15 +38,15 @@ articles claimed by that ORCID.
 I<Numerical> arguments are interpreted as publishing years. Single or
 two-digit years are moved into the current or previous century. Two
 numerical arguments or an argument like '2012-2014' specify a
-range. '2004-' means since 2004, '-2004' means until 2004.
+range. '2004-' and '-2004' work as one would expect.
 
 =item [B<-o>] OBJECT
 
 Read the next argument as the name or identifier of an astronomical
 object. Underscore may be used instead of space to eliminate the need
 for quotes.  B<ads> is pretty good at recognizing object identifiers
-even if you leave out the B<-o>, but if that does not work or if you
-want to be sure write, for example, 'B<-o> Sirius'.
+even if B<-o> is omitted, but if that does not work or if you want to
+be sure, write e.g. 'B<-o> Sirius'.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
@@ -83,7 +83,8 @@ letter, in full, or abbreviated.
 =item B<-d>
 
 Print debugging information. This needs to be the first command line
-argument to be effective.
+argument to be effective.  Use B<-D> if the URL should be constructed
+and shown, but not opened.
 
 =back
 
