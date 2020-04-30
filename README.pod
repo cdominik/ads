@@ -13,7 +13,7 @@ Make the F<ads> file executable and put it on your execution path.
 =head1 DESCRIPTION
 
 B<ads> is a commandline tool to pass a query to the website of the
-Astrophysical Data System (L<ADS|https://adsabs.harvard.edu/>). The
+Astrophysical Data System (L<ADS|http://adsabs.harvard.edu/>). The
 tool constructs a query URL and sends it to the default web
 browser. B<ads> takes author names, publishing years, and astronomical
 object identifiers from the command line with as little fuss as
@@ -30,7 +30,7 @@ I<Alphabetic> arguments are parsed as author last names. A first name
 initial can be added like 'f.last' (separated by dot) or 'last,f'
 (separated by comma). Use underscores as in 'van_den_Heuvel' or quote
 '"van den Heuvel"' if the name contains spaces.  If an argument looks
-like (the significant tail of) an L<ORCID|https://orchid.org>, find
+like (the significant tail of) an L<ORCID|http://orchid.org>, find
 articles claimed by that ORCID.
 
 =item PUBLISHING YEARS
