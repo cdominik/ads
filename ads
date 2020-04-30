@@ -453,10 +453,6 @@ abstract.
 
     ads -aplanet -a system
 
-Get articles about HD 142527 since 2017.
-
-    ads hd_142527 17-
-
 =head1 AUTHOR
 
 Carsten Dominik    <dominik.dominik@gmail.com>
