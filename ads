@@ -328,7 +328,7 @@ END
 
 =head1 NAME
 
-B<ads> - commandline access to L<ADS|https:://adsabs.harvard.edu/ads_abstracts.html (Astrophysical Data System)
+B<ads> - commandline access to ADS (Astrophysical Data System)
 
 =head1 SYNOPSIS
 
@@ -339,7 +339,7 @@ Make the F<ads> file executable and put it on your execution path.
 =head1 DESCRIPTION
 
 B<ads> is a commandline tool to pass a query to the website of the
-Astrophysical Data System (L<ADS|https:://adsabs.harvard.edu/>). The
+Astrophysical Data System (L<ADS|https://adsabs.harvard.edu/>). The
 tool constructs a query URL and sends it to the default web
 browser. B<ads> takes author names, publishing years, and astronomical
 object identifiers from the command line with as little fuss as
@@ -368,7 +368,7 @@ range. '2004-' means since 2004, '-2004' means until 2004.
 
 =item [B<-o>] OBJECT
 
-Read the next argument as the name or identifier of an astronomical
+Read the next argument as thename or identifier of an astronomical
 object. Underscore may be used instead of space to eliminate the need
 for quotes.  B<ads> is pretty good at recognizing object identifiers
 even if you leave out the B<-o>, but if that does not work or if you
