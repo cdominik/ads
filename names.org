@@ -1,0 +1,456 @@
+* Constellations and their abbreviations
+| And | Andromeda           | Andromedae          |
+| Ant | Antlia              | Antliae             |
+| Aps | Apus                | Apodis              |
+| Aqr | Aquarius            | Aquarii             |
+| Aql | Aquila              | Aquilae             |
+| Ara | Ara                 | Arae                |
+| Ari | Aries               | Arietis             |
+| Aur | Auriga              | Aurigae             |
+| Boo | Boötes              | Boötis              |
+| Cae | Caelum              | Caeli               |
+| Cam | Camelopardalis      | Camelopardalis      |
+| Cnc | Cancer              | Cancri              |
+| CVn | Canes Venatici      | Canum Venaticorum   |
+| CMa | Canis Major         | Canis Majoris       |
+| CMi | Canis Minor         | Canis Minoris       |
+| Cap | Capricornus         | Capricorni          |
+| Car | Carina              | Carinae             |
+| Cas | Cassiopeia          | Cassiopeiae         |
+| Cen | Centaurus           | Centauri            |
+| Cep | Cepheus             | Cephei              |
+| Cet | Cetus               | Ceti                |
+| Cha | Chamaeleon          | Chamaeleontis       |
+| Cir | Circinus            | Circini             |
+| Col | Columba             | Columbae            |
+| Com | Coma Berenices      | Comae Berenices     |
+| CrA | Corona Australis    | Coronae Australis   |
+| CrB | Corona Borealis     | Coronae Borealis    |
+| Crv | Corvus              | Corvi               |
+| Crt | Crater              | Crateris            |
+| Cru | Crux                | Crucis              |
+| Cyg | Cygnus              | Cygni               |
+| Del | Delphinus           | Delphini            |
+| Dor | Dorado              | Doradus             |
+| Dra | Draco               | Draconis            |
+| Eql | Equuleus            | Equulei             |
+| Eri | Eridanus            | Eridani             |
+| For | Fornax              | Fornacis            |
+| Gem | Gemini              | Geminorum           |
+| Gru | Grus                | Gruis               |
+| Her | Hercules            | Herculis            |
+| Hor | Horologium          | Horologii           |
+| Hya | Hydra               | Hydrae              |
+| Hyi | Hydrus              | Hydri               |
+| Ind | Indus               | Indi                |
+| Lac | Lacerta             | Lacertae            |
+| Leo | Leo                 | Leonis              |
+| LMi | Leo Minor           | Leonis Minoris      |
+| Lep | Lepus               | Leporis             |
+| Lib | Libra               | Librae              |
+| Lup | Lupus               | Lupi                |
+| Lyn | Lynx                | Lyncis              |
+| Lyr | Lyra                | Lyrae               |
+| Men | Mensa               | Mensae              |
+| Mic | Microscopium        | Microscopii         |
+| Mon | Monoceros           | Monocerotis         |
+| Mus | Musca               | Muscae              |
+| Nor | Norma               | Normae              |
+| Oct | Octans              | Octantis            |
+| Oph | Ophiuchus           | Ophiuchi            |
+| Ori | Orion               | Orionis             |
+| Pav | Pavo                | Pavonis             |
+| Peg | Pegasus             | Pegasi              |
+| Per | Perseus             | Persei              |
+| Phe | Phoenix             | Phoenicis           |
+| Pic | Pictor              | Pictoris            |
+| Psc | Pisces              | Piscium             |
+| PsA | Piscis Austrinus    | Piscis Austrini     |
+| Pup | Puppis              | Puppis              |
+| Pyx | Pyxis               | Pyxidis             |
+| Ret | Reticulum           | Reticulii           |
+| Sge | Sagitta             | Sagittae            |
+| Sgr | Sagittarius         | Sagittarii          |
+| Sco | Scorpius5           | Scorpii             |
+| Scl | Sculptor            | Sculptoris          |
+| Sct | Scutum              | Scuti               |
+| Ser | Serpens             | Serpentis           |
+| Sex | Sextans             | Sextantis           |
+| Tau | Taurus              | Tauri               |
+| Tel | Telescopium         | Telescopii          |
+| Tri | Triangulum          | Trianguli           |
+| TrA | Triangulum Australe | Trianguli Australis |
+| Tuc | Tucana              | Tucanae             |
+| UMa | Ursa Major          | Ursae Majoris       |
+| UMi | Ursa Minor          | Ursae Minoris       |
+| Vel | Vela                | Velorum             |
+| Vir | Virgo               | Virginis            |
+| Vol | Volans              | Volantis            |
+| Vul | Vulpecula           | Vulpeculae          |
+
+
+* Greek letters
+alpha
+beta
+gamma
+delta
+epsilon
+zeta
+eta
+theta
+iota
+kappa
+lambda
+mu
+nu
+xi
+omikron
+pi
+rho
+sigma
+tau
+upsilon
+phi
+chi
+psi
+omega
+
+
+* Proper names of stars
+
+Acamar
+Achernar
+Achird
+Acrab
+Acrux
+Acubens
+Adhafera
+Adhara
+Adhil
+Ain
+Ainalrami
+Aladfar
+Albaldah
+Albali
+Albireo
+Alchiba
+Alcor
+Alcyone
+Aldebaran
+Alderamin
+Aldhanab
+Aldhibah
+Aldulfin
+Alfirk
+Algedi
+Algenib
+Algieba
+Algol
+Algorab
+Alhena
+Alioth
+Aljanah
+Alkaid
+Alkalurops
+Alkaphrah
+Alkarab
+Alkes
+Almaaz
+Almach
+Alnair
+Alnasl
+Alnilam
+Alnitak
+Alniyat
+Alphard
+Alphecca
+Alpheratz
+Alpherg
+Alrakis
+Alrescha
+Alruba
+Alsafi
+Alsciaukat
+Alsephina
+Alshain
+Alshat
+Altair
+Altais
+Alterf
+Aludra
+Alula Australis
+Alula Borealis
+Alya
+Alzirr
+Ancha
+Angetenar
+Ankaa
+Anser
+Antares
+Arcturus
+Arkab Posterior
+Arkab Prior
+Arneb
+Ascella
+Asellus Australis
+Asellus Borealis
+Ashlesha
+Aspidiske
+Asterope
+Athebyne
+Atik
+Atlas
+Atria
+Avior
+Azelfafage
+Azha
+Azmidi
+Barnard's Star
+Baten Kaitos
+Beemim
+Beid
+Bellatrix
+Betelgeuse
+Bharani
+Biham
+Botein
+Brachium
+Bunda
+Canopus
+Capella
+Caph
+Castor
+Castula
+Cebalrai
+Celaeno
+Cervantes
+Chalawan
+Chamukuy
+Chara
+Chertan
+Copernicus
+Cor Caroli
+Cujam
+Cursa
+Dabih
+Dalim
+Deneb
+Deneb Algedi
+Denebola
+Diadem
+Diphda
+Dschubba
+Dubhe
+Dziban
+Edasich
+Electra
+Elgafar
+Elkurud
+Elnath
+Eltanin
+Enif
+Errai
+Fafnir
+Fang
+Fawaris
+Felis
+Fomalhaut
+Fulu
+Fumalsamakah
+Furud
+Fuyue
+Gacrux
+Giausar
+Gienah
+Ginan
+Gomeisa
+Grumium
+Gudja
+Guniibuu
+Hadar
+Haedus
+Hamal
+Hassaleh
+Hatysa
+Helvetios
+Heze
+Homam
+Iklil
+Imai
+Intercrus
+Izar
+Jabbah
+Jishui
+Kaffaljidhma
+Kang
+Kaus Australis
+Kaus Borealis
+Kaus Media
+Keid
+Khambalia
+Kitalpha
+Kochab
+Kornephoros
+Kraz
+Kurhah
+La Superba
+Larawag
+Lesath
+Libertas
+Lich
+Lilii Borea
+Maasym
+Mahasim
+Maia
+Marfik
+Markab
+Markeb
+Marsic
+Matar
+Mebsuta
+Megrez
+Meissa
+Mekbuda
+Meleph
+Menkalinan
+Menkar
+Menkent
+Menkib
+Merak
+Merga
+Meridiana
+Merope
+Mesarthim
+Miaplacidus
+Mimosa
+Minchir
+Minelauva
+Mintaka
+Mira
+Mirach
+Miram
+Mirfak
+Mirzam
+Misam
+Mizar
+Mothallah
+Muliphein
+Muphrid
+Muscida
+Musica
+Nahn
+Naos
+Nashira
+Nekkar
+Nembus
+Nihal
+Nunki
+Nusakan
+Ogma
+Okab
+Paikauhale
+Peacock
+Phact
+Phecda
+Pherkad
+Piautos
+Pipirima
+Pleione
+Polaris
+Polaris Australis
+Polis
+Pollux
+Porrima
+Praecipua
+Prima Hyadum
+Procyon
+Propus
+Proxima Centauri
+Ran
+Rasalas
+Rasalgethi
+Rasalhague
+Rastaban
+Regulus
+Revati
+Rigel
+Rigil Kentaurus
+Rotanev
+Ruchbah
+Rukbat
+Sabik
+Saclateni
+Sadachbia
+Sadalbari
+Sadalmelik
+Sadalsuud
+Sadr
+Saiph
+Salm
+Sargas
+Sarin
+Sceptrum
+Scheat
+Schedar
+Secunda Hyadum
+Segin
+Seginus
+Sham
+Shaula
+Sheliak
+Sheratan
+Sirius
+Situla
+Skat
+Spica
+Sualocin
+Subra
+Suhail
+Sulafat
+Syrma
+Tabit
+Taiyangshou
+Taiyi
+Talitha
+Tania Australis
+Tania Borealis
+Tarazed
+Tarf
+Taygeta
+Tegmine
+Tejat
+Terebellum
+Theemin
+Thuban
+Tiaki
+Tianguan
+Tianyi
+Titawin
+Toliman
+Tonatiuh
+Torcular
+Tureis
+Ukdah
+Unukalhai
+Unurgunite
+Vega
+Veritate
+Vindemiatrix
+Wasat
+Wazn
+Wezen
+Wurren
+Xamidimura
+Xuange
+Yed Posterior
+Yed Prior
+Yildun
+Zaniah
+Zaurak
+Zavijava
+Zhang
+Zibal
+Zosma
+Zubenelgenubi
+Zubenelhakrabi
+Zubeneschamali

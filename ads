@@ -253,18 +253,21 @@ sub encode_string {
 }
 
 sub make_object_regexp {
-  # Return a regular expression that matches and object in order to
+  # Return a regular expression that matches an object in order to
   # distinguish it from a human name.  So this can be pretty
   # imperfect, as long as it does not easily match human names.
+
+  my $alphanumeric  = "(?:.*?[a-z].*?[0-9].*|.*?[0-9].*?[a-z].*)";
+  return "(?i)$alphanumeric" unless $clever_object_detection;
   
-  @greek_letters = (
+  my @greek_letters = (
     # written version of the greek letters
     "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta",
     "theta", "iota", "kappa", "lambda", "mu", "nu", "xi", "omi[ck]ron",
     "pi", "rho", "sigma", "tau", "upsilon", "phi", "chi", "psi",
     "omega" );
 
-  @propernames = (
+  my @propernames = (
     # Proper names of stars that should be recognized I have only a
     # few names here that I recognize, and that do not conflict with
     # actual author names.  The user can add here if she wants.
@@ -276,10 +279,8 @@ sub make_object_regexp {
   my $constellation = "(?:[a-z]{3,})"; # at lease three letters
   my $greekletter   = "(?:" . join("|",@greek_letters) . ")";
   my $propername    = "(?:" . join("|",@propernames) . ")";
-  my $alphanumeric  = "(?:.*?[a-z].*?[0-9].*|.*?[0-9].*?[a-z].*)";
   my $binpl         = "(?:[a-z]{1,2})"; # binary or planet
   my $variable      = "(?:[a-z]{1,2})"; # one or two letters
-  return "(?i)$alphanumeric" unless $clever_object_detection;
   return 
     # Case-insensitive matching
     "(?i)" .
