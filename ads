@@ -31,14 +31,12 @@ $sort     = "date";  $sort_dir = "desc";
 
 $clever_object_detection = 1;  # When 0, only recognize alpha+numeric
 $objectre = &make_object_regexp();
-print "$objectre\n";
 
 # Process command line options. We do it by hand, to allow
 # an arbitraty mix between switches and other args
 while ($arg = shift @ARGV) {
   &dbg("Processing argment $arg\n");
   $argws = &fix_spaces($arg);
-  print ">$arg<  >$argws<\n";
   if ($arg =~ /^-([dDrcAPG])(.*)/) {
     # a switch without a value
     if    ($1 eq "r") { $opt_r = 1;  &dbg("REFEREED only\n")      }
