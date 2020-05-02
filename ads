@@ -30,9 +30,9 @@ $sort     = "date";  $sort_dir = "desc";
   );
 
 # Automatically detect objec name arguments.
-# When 0, only recognize alpha+numeric names as objects
-# When 1, also detect stuff like CV_Cha, "beta pic b"
-$clever_od = 1;
+# When arg is 0, only recognize alpha+numeric names as objects
+# When arg is 1, also detect stuff like CV_Cha, "beta pic b"
+$objectre = &make_object_regexp(1);
 
 # Process command line options. We do it by hand, to allow
 # an arbitraty mix between switches and other args
@@ -43,7 +43,7 @@ while ($arg = shift @ARGV) {
     # a switch without a value
     if    ($1 eq "r") { $opt_r = 1;  &dbg("REFEREED only")      }
     elsif ($1 eq "c") { $opt_s = $1; &dbg("Interpreted as -sc") }
-    elsif ($1 eq "x") { $clever_od = 0 }
+    elsif ($1 eq "x") { $objectre = &make_object_regexp(0)      }
     elsif ($1 eq "A" or $1 eq "P" or $1 eq "G") {
       $database = $1;
       &dbg("Selecting $dhash{$1} database");
@@ -78,7 +78,6 @@ while ($arg = shift @ARGV) {
     &handle_author($arg);
   }
 }
-$objectre = &make_object_regexp($clever_od);
 
 # Build the different parts of the query
 
