@@ -29,23 +29,26 @@ $sort     = "date";  $sort_dir = "desc";
            ac=> "author_count",        na  => "ac"
   );
 
-$clever_object_detection = 1;  # When 0, only recognize alpha+numeric
-$objectre = &make_object_regexp();
+# Automatically detect objec name arguments.
+# When 0, only recognize alpha+numeric names as objects
+# When 1, also detect stuff like CV_Cha, "beta pic b"
+$clever_od = 1;
+$objectre = &make_object_regexp($clever_od);
 
 # Process command line options. We do it by hand, to allow
 # an arbitraty mix between switches and other args
 while ($arg = shift @ARGV) {
-  &dbg("Processing argment $arg\n");
+  &dbg("Processing argment $arg");
   $argws = &fix_spaces($arg);
   if ($arg =~ /^-([dDrcAPG])(.*)/) {
     # a switch without a value
-    if    ($1 eq "r") { $opt_r = 1;  &dbg("REFEREED only\n")      }
-    elsif ($1 eq "c") { $opt_s = $1; &dbg("Interpreted as -sc\n") }
+    if    ($1 eq "r") { $opt_r = 1;  &dbg("REFEREED only")      }
+    elsif ($1 eq "c") { $opt_s = $1; &dbg("Interpreted as -sc") }
     elsif ($1 eq "A" or $1 eq "P" or $1 eq "G") {
       $database = $1;
-      &dbg("Selecting $dhash{$1} database\n");
+      &dbg("Selecting $dhash{$1} database");
     } else {
-      $opt_d = 1; &dbg("Debugging on\n");
+      $opt_d = 1; &dbg("Debugging on");
       $noexecute = 1 if $1 eq "D";
     }
     # Put clustered switches and arguments back onto ARGV
@@ -53,21 +56,21 @@ while ($arg = shift @ARGV) {
   } elsif ($arg =~ /^-([tafso])(.*)/) {
     # A switch with a value
     $value = length($2)>0 ? $2 : shift @ARGV;
-    if    ($1 eq "s") {$opt_s = $value;       &dbg("SORTING:  $value\n")}
-    elsif ($1 eq "t") {push @title,   $value; &dbg("TITLE:    $value\n")}
-    elsif ($1 eq "a") {push @abstract,$value; &dbg("ABSTRACT: $value\n")}
-    elsif ($1 eq "f") {push @fulltext,$value; &dbg("FULLTEXT: $value\n")}
+    if    ($1 eq "s") {$opt_s = $value;       &dbg("SORTING:  $value")}
+    elsif ($1 eq "t") {push @title,   $value; &dbg("TITLE:    $value")}
+    elsif ($1 eq "a") {push @abstract,$value; &dbg("ABSTRACT: $value")}
+    elsif ($1 eq "f") {push @fulltext,$value; &dbg("FULLTEXT: $value")}
     elsif ($1 eq "o") {push @object,  &fix_spaces($value);
-                       &dbg("OBJECT:   $object[0]\n")}
+                       &dbg("OBJECT:   $object[0]")}
   } elsif ($arg =~ /^(\d+|-\d+|\d+-|\d+-\d+)$/) {
     # This is a year specification: 2000 or -2000 or 2000- or 2000-2005
     &handle_year($arg);
   } elsif ($arg =~ /^\d{1,4}(-\d{4}){2,3}$/) {
     # This looks like an ORCID
-    push @orcid,&fix_orcid($arg);   &dbg("ORCID:    $orcid[0]\n");
+    push @orcid,&fix_orcid($arg);   &dbg("ORCID:    $orcid[0]");
   } elsif (($argws =~ /$objectre/) or $arg =~ s/-o$//) {
     # This looks like an object name, or the -o at the end forces the issue
-    push @object,&fix_spaces($arg); &dbg("OBJECT:   $object[0]\n");
+    push @object,&fix_spaces($arg); &dbg("OBJECT:   $object[0]");
   } elsif ($arg =~ /^-/) {
     die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n";
   } else {
@@ -75,6 +78,7 @@ while ($arg = shift @ARGV) {
     &handle_author($arg);
   }
 }
+&dbg("Using clever object name detection (without -o)") if $clever_od;
 
 # Build the different parts of the query
 
@@ -128,7 +132,7 @@ $url = "https://ui.adsabs.harvard.edu/search/"
 
 # Send the URL to the browser.
 # How to do this depends on the underlying system
-&dbg("Calling URL: $url\n");
+&dbg("Calling URL: $url");
 unless ($noexecute) {
   if    ($^O =~ /darwin/i) { exec "open '$url'";         }
   elsif ($^O =~ /linux/i)  { exec "xdg-open '$url'";     }
@@ -144,7 +148,7 @@ unless ($noexecute) {
 # Subroutines
 
 # Print a line if debugging is on
-sub dbg { print shift if $opt_d; }
+sub dbg { print shift . "\n" if $opt_d; }
 
 sub handle_author {
   # Put initials in the back, and convert underscore to space
@@ -157,9 +161,9 @@ sub handle_author {
   $a =~ s/\s+$//;
   $a =~ s/\.$//;
   if ($a eq $a1) {
-    &dbg("AUTHOR:   \"$a\"\n");
+    &dbg("AUTHOR:   \"$a\"");
   } else {
-    &dbg("AUTHOR:   \"$a1\" as \"$a\"\n");
+    &dbg("AUTHOR:   \"$a1\" as \"$a\"");
   }
   push @authors,$a;
 }
@@ -188,8 +192,8 @@ sub handle_year {
   } else { die "Something went wrong with year processing of $ys\n" }
   $y1 = &normalize_year($y1);
   $y2 = &normalize_year($y2);
-  if ($y1) {push @years,$y1; &dbg("YEAR: $force $y1\n")}
-  if ($y2) {push @years,$y2; &dbg("YEAR: $force $y2\n")}
+  if ($y1) {push @years,$y1; &dbg("YEAR: $force $y1")}
+  if ($y2) {push @years,$y2; &dbg("YEAR: $force $y2")}
   $force_yr_range = $force unless $force_yr_range;
 }
 
@@ -203,7 +207,7 @@ sub normalize_year {
     my $two_d_year = substr $cy,2;
     my $century = 100 * substr( $cy,0,2);
     my $yn = $y + $century - ($y <= $two_d_year+1 ? 0 : 100);
-    &dbg("Year $y interpreted as $yn\n");
+    &dbg("Year $y interpreted as $yn");
     $y = $yn;
   }
   return $y;
@@ -235,7 +239,7 @@ sub get_sorting {
   my $s = shift @_;
   my $s1 = $s;
   $s = $shash{$s} while length($s) < 4;
-  &dbg("Sorting option '$s1' translated to '$s'\n") if $s1 ne $s;
+  &dbg("Sorting option '$s1' translated to '$s'") if $s1 ne $s;
   return $s;
 }
 
@@ -258,8 +262,9 @@ sub make_object_regexp {
   # distinguish it from a human name.  So this can be pretty
   # imperfect, as long as it does not easily match human names.
 
+  my $clever = shift;
   my $alphanumeric  = "(?:.*?[a-z].*?[0-9].*|.*?[0-9].*?[a-z].*)";
-  return "(?i)$alphanumeric" unless $clever_object_detection;
+  return "(?i)$alphanumeric" unless $clever;
   
   my @greek_letters = (
     # written version of the greek letters
