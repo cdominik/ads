@@ -10,8 +10,8 @@ if (not @ARGV or $ARGV[0] =~ /^--?h(elp)?$/) { &usage(); exit(0); }
 
 # Some defaults and option hashes
 
-# Collections to be searched.  This can be P for "physics", A for "astronomy",
-# or G for general.  Leave empty to search all by default.
+# Collections to be searched. This can be P for "physics", A for "astronomy",
+# or G for general. Leave empty to search all by default.
 $database = "";
 %dhash = ( A => "astronomy", P => "physics", G => "general" );
 
@@ -116,18 +116,16 @@ if ($sort eq "first_author") {$sort_dir = "asc";} # change sort direction
 $sorting  = "&sort=$sort $sort_dir, bibcode desc";
 
 # Collection
-$database = "&fq=database:$dhash{$database}" if $database;
+$database = &enc("&fq=database:$dhash{$database}") if $database;
 
 # Refereed only or also unrefereed?
-$refstring =  "filter_property_fq_property=AND&filter_property_fq_property=property%3A%22refereed%22&fq=%7B!type=aqp%20v%3D%24fq_property%7D&fq_property=(property%3A%22refereed%22)&";
+$ref = 'filter_property_fq_property=AND&filter_property_fq_property=property:"refereed"&fq={!type=aqp v=$fq_property}&fq_property=(property:"refereed")&' if $opt_r;
 
 # Build and encode the URL
 $url = "q=" . " $authors$years"
   . $title . $abstract . $fulltext . $object . $orcid . $database
   . "$sorting" . "&p_=0";
-$url = &encode_string($url);
-$url = "https://ui.adsabs.harvard.edu/search/"
-  . ($opt_r ? $refstring : "") . $url;
+$url = "https://ui.adsabs.harvard.edu/search/" . &enc($ref) . &enc($url);
 
 # Send the URL to the browser.
 # How to do this depends on the underlying system
@@ -242,7 +240,7 @@ sub get_sorting {
   return $s;
 }
 
-sub encode_string {
+sub enc {
   # Encode special characters and collapse multiple spaces
   my $s = shift @_;
   $s =~ s/"/%22/g;
@@ -360,7 +358,7 @@ command line switches.
 I<Alphabetic> arguments are parsed as author last names. A first name
 initial can be added like 'f.last' (separated by dot) or 'last,f'
 (separated by comma). Use underscores as in 'van_den_Heuvel' or quote
-'"van den Heuvel"' if the name contains spaces.  If an argument looks
+'"van den Heuvel"' if the name contains spaces. If an argument looks
 like (the significant tail of) an L<ORCID|http://orchid.org>, find
 articles claimed by that ORCID.
 
@@ -375,20 +373,20 @@ range. '2004-' and '-2004' work as one would expect.
 
 Read the next argument as the name or identifier of an astronomical
 object. Underscore may be used instead of space to eliminate the need
-for quotes.  B<ads> is pretty good at recognizing object identifiers
+for quotes. B<ads> is pretty good at recognizing object identifiers
 even if B<-o> is omitted, but if that does not work or if you want to
 be sure, write e.g. 'B<-o> Sirius'.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
 String phrase to be matched in the I<title>, I<abstract>, or
-I<fulltext>, respectively, of a bibliographic source.  Multiple
+I<fulltext>, respectively, of a bibliographic source. Multiple
 B<-t>/B<-a>/B<-f> switches with strings can be given to retrieve
 sources that match all requested strings.
 
 =item B<-c>
 
-Sort matches by citation count.  The default is to sort by date. B<-c>
+Sort matches by citation count. The default is to sort by date. B<-c>
 is a shorthand for B<-sc>.
 
 =item B<-r>
@@ -414,7 +412,7 @@ letter, in full, or abbreviated.
 =item B<-d>
 
 Print debugging information. This needs to be the first command line
-argument to be effective.  Use B<-D> if the URL should be constructed
+argument to be effective. Use B<-D> if the URL should be constructed
 and shown, but not opened.
 
 =back
