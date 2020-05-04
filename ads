@@ -122,10 +122,10 @@ $database = &enc("&fq=database:$dhash{$database}") if $database;
 $ref = 'filter_property_fq_property=AND&filter_property_fq_property=property:"refereed"&fq={!type=aqp v=$fq_property}&fq_property=(property:"refereed")&' if $opt_r;
 
 # Build and encode the URL
-$url = "q=" . " $authors$years" .
-  $ref . $title . $abstract . $fulltext . $object . $orcid . $database .
-  $sorting . "&p_=0";
-$url = "https://ui.adsabs.harvard.edu/search/" . &enc($url);
+$url = "q=" . " $authors$years"
+  . $title . $abstract . $fulltext . $object . $orcid . $database
+  . "$sorting" . "&p_=0";
+$url = "https://ui.adsabs.harvard.edu/search/" . &enc($ref) . &enc($url);
 
 # Send the URL to the browser.
 # How to do this depends on the underlying system
