@@ -56,21 +56,21 @@ while ($arg = shift @ARGV) {
   } elsif ($arg =~ /^-([tafso])(.*)/) {
     # A switch with a value
     $value = length($2)>0 ? $2 : shift @ARGV;
-    if    ($1 eq "s") {$opt_s = $value;       &dbg("SORTING:  $value")}
-    elsif ($1 eq "t") {push @title,   $value; &dbg("TITLE:    $value")}
-    elsif ($1 eq "a") {push @abstract,$value; &dbg("ABSTRACT: $value")}
-    elsif ($1 eq "f") {push @fulltext,$value; &dbg("FULLTEXT: $value")}
-    elsif ($1 eq "o") {push @object,  &fix_spaces($value);
-                       &dbg("OBJECT:   $object[0]")}
+    $valws = &fix_spaces($value);
+    if    ($1 eq "s") {$opt_s = $value;       &dbg("SORTING:  $valws")}
+    elsif ($1 eq "t") {push @title,   $valws; &dbg("TITLE:    $valws")}
+    elsif ($1 eq "a") {push @abstract,$valws; &dbg("ABSTRACT: $valws")}
+    elsif ($1 eq "f") {push @fulltext,$valws; &dbg("FULLTEXT: $valws")}
+    elsif ($1 eq "o") {push @object,  $valws; &dbg("OBJECT:   $valws")}
   } elsif ($arg =~ /^(\d+|-\d+|\d+-|\d+-\d+)$/) {
     # This is a year specification: 2000 or -2000 or 2000- or 2000-2005
     &handle_year($arg);
   } elsif ($arg =~ /^\d{1,4}(-\d{4}){2,3}$/) {
     # This looks like an ORCID
-    push @orcid,&fix_orcid($arg);   &dbg("ORCID:    $orcid[0]");
+    push @orcid,&fix_orcid($arg);             &dbg("ORCID:    $orcid[0]");
   } elsif (($argws =~ /$objectre/) or $arg =~ s/-o$//) {
     # This looks like an object name, or the -o at the end forces the issue
-    push @object,&fix_spaces($arg); &dbg("OBJECT:   $object[0]");
+    push @object,$argws;                      &dbg("OBJECT:   $argws");
   } elsif ($arg =~ /^-/) {
     die "Unknown command line switch `$arg'.\nRun `ads' for usage info, `perldoc ads' for full manpage.\n";
   } else {
@@ -127,9 +127,8 @@ $url = "q=" . " $authors$years"
   . "$sorting" . "&p_=0";
 $url = "https://ui.adsabs.harvard.edu/search/" . &enc($ref) . &enc($url);
 
-# Send the URL to the browser.
-# How to do this depends on the underlying system
-&dbg("Calling URL: $url");
+# Send the URL to the browser, cater for underlying operating system
+&dbg("URL: $url");
 unless ($noexecute) {
   if    ($^O =~ /darwin/i) { exec "open '$url'";         }
   elsif ($^O =~ /linux/i)  { exec "xdg-open '$url'";     }
@@ -151,17 +150,12 @@ sub handle_author {
   # Put initials in the back, and convert underscore to space
   # Then, add the author to the list
   my $a = shift;
-  my $a1 = $a;
   $a = "$3,$1" if $a =~ /((\w+\.)+)(.+)/;
   $a =~ s/_/ /g;
   $a =~ s/^\s+//;
   $a =~ s/\s+$//;
   $a =~ s/\.$//;
-  if ($a eq $a1) {
-    &dbg("AUTHOR:   \"$a\"");
-  } else {
-    &dbg("AUTHOR:   \"$a1\" as \"$a\"");
-  }
+  &dbg("AUTHOR:   $a");
   push @authors,$a;
 }
 
@@ -351,43 +345,42 @@ command line switches.
 
 =head1 ARGUMENTS and OPTIONS
 
+Multiple search criteria are combined with logical AND.  Underscore
+may be used instead of space to avoid quotes, e.g. van_den_Heuvel
+instead of "van den Heuvel".
+
 =over 5
 
 =item AUTHOR NAMES
 
 I<Alphabetic> arguments are parsed as author last names. A first name
 initial can be added like 'f.last' (separated by dot) or 'last,f'
-(separated by comma). Use underscores as in 'van_den_Heuvel' or quote
-'"van den Heuvel"' if the name contains spaces. If an argument looks
-like (the significant tail of) an L<ORCID|http://orchid.org>, find
-articles claimed by that ORCID.
+(separated by comma). If an argument looks like (the significant tail
+of) an L<ORCID|http://orchid.org>, find articles claimed by that
+ORCID.
 
 =item PUBLISHING YEARS
 
 I<Numerical> arguments are interpreted as publishing years. Single or
-two-digit years are moved into the current or previous century. Two
+double digit years are moved into the current or previous century. Two
 numerical arguments or an argument like '2012-2014' specify a
 range. '2004-' and '-2004' work as one would expect.
 
 =item [B<-o>] OBJECT
 
 Read the next argument as the name or identifier of an astronomical
-object. Underscore may be used instead of space to eliminate the need
-for quotes. B<ads> is pretty good at recognizing object identifiers
-even if B<-o> is omitted, but if that does not work or if you want to
-be sure, write e.g. 'B<-o> Sirius'.
+object. B<ads> is pretty good at recognizing object identifiers even
+if B<-o> is omitted, but if that does not work or if you want to be
+sure, write e.g. 'B<-o> Sirius'.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
 String phrase to be matched in the I<title>, I<abstract>, or
-I<fulltext>, respectively, of a bibliographic source. Multiple
-B<-t>/B<-a>/B<-f> switches with strings can be given to retrieve
-sources that match all requested strings.
+I<fulltext>, respectively, of a bibliographic source.
 
 =item B<-c>
 
-Sort matches by citation count. The default is to sort by date. B<-c>
-is a shorthand for B<-sc>.
+Sort matches by citation count. The default is to sort by date.
 
 =item B<-r>
 
@@ -401,7 +394,8 @@ respectively.
 =item B<-s> SORTING
 
 Sorting mode for matched entries. The mode can be given as a single
-letter, in full, or abbreviated.
+letter, in full, or abbreviated.  See also B<-c>, which is short for
+B<-s>c.
 
   d  => date                  # This is the default
   a  => first_author          # abbreviations: fa
