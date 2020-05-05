@@ -345,19 +345,14 @@ command line switches.
 
 =head1 ARGUMENTS and OPTIONS
 
-Multiple search criteria are combined with logical AND.  Underscore
-may be used instead of space to avoid quotes, e.g. van_den_Heuvel
-instead of "van den Heuvel".
-
 =over 5
 
 =item AUTHOR NAMES
 
 I<Alphabetic> arguments are parsed as author last names. A first name
-initial can be added like 'f.last' (separated by dot) or 'last,f'
-(separated by comma). If an argument looks like (the significant tail
-of) an L<ORCID|http://orchid.org>, find articles claimed by that
-ORCID.
+initial can be added like 'f.last' or 'last,f'. If an argument looks
+like (the significant tail of) an L<ORCID|http://orchid.org>, find
+articles claimed by that ORCID.
 
 =item PUBLISHING YEARS
 
@@ -394,7 +389,7 @@ respectively.
 =item B<-s> SORTING
 
 Sorting mode for matched entries. The mode can be given as a single
-letter, in full, or abbreviated.  See also B<-c>, which is short for
+letter, in full, or abbreviated. See also B<-c>, which is short for
 B<-s>c.
 
   d  => date                  # This is the default
@@ -424,7 +419,8 @@ author, and in the range from 1999 to 2004.
     ads -r ^Dullemond Dominik 1999-2004
     ads -r ^Dullemond Dominik 99-4
 
-Get papers of Ed van den Heuvel.
+In any of the arguments, underscore can be used instead of space to
+avoid the need for quotes.
 
     ads "van den heuvel,E"
     ads van_den_heuvel,E
