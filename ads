@@ -364,9 +364,9 @@ range. '2004-' and '-2004' work as one would expect.
 =item [B<-o>] OBJECT
 
 Read the next argument as the name or identifier of an astronomical
-object. B<ads> is pretty good at recognizing object identifiers even
-if B<-o> is omitted, but if that does not work or if you want to be
-sure, write e.g. 'B<-o> Sirius'.
+object. B<ads> is pretty good at distinguishing objects from authors
+even if B<-o> is omitted, but if that does not work or if you want to
+be sure, write e.g. 'B<-o> Sirius'.
 
 =item B<-t> STRING, B<-a> STRING, B<-f> STRING
 
