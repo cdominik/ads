@@ -359,7 +359,7 @@ articles claimed by that ORCID.
 I<Numerical> arguments are interpreted as publishing years. Single or
 double digit years are moved into the current or previous century. Two
 such arguments or '2012-2014' specify a range. '2004-' and '-2004'
-work as one would expect.
+work as expected.
 
 =item [B<-o>] OBJECT
 
