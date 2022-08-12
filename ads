@@ -283,7 +283,9 @@ sub make_object_regexp {
   my $greekletter   = "(?:" . join("|",@greek_letters) . ")";
   my $propername    = "(?:" . join("|",@propernames) . ")";
   my $binpl         = "(?:[a-z]{1,2})"; # binary or planet
-  my $variable      = "(?:[a-z]{1,2})"; # one or two letters
+  my $variable      = "(?:[a-z]{1,2})(?<!(?-i)(?:de|af))"; # one or two letters
+  # In the last expression, we protct de for "de Mink" and af for "af Klimt"
+
   return 
     # Case-insensitive matching
     "(?i)" .
